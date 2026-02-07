@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../core/database/daos/person_dao.dart';
 import '../../../../shared/models/person.dart';
 import '../../../../shared/providers/database_provider.dart';
+import '../../../home/data/providers/month_summary_provider.dart';
 
 part 'person_notifier.g.dart';
 
@@ -33,6 +34,10 @@ class PersonNotifier extends _$PersonNotifier {
       ref.invalidate(bibleStudiesCountProvider);
       ref.invalidate(interestedPersonsCountProvider);
 
+      // Invalidate month summary to update Bible studies count on home
+      ref.invalidate(monthSummaryProvider);
+      ref.invalidate(currentMonthSummaryProvider);
+
       return await personDao.getAll();
     });
   }
@@ -50,6 +55,10 @@ class PersonNotifier extends _$PersonNotifier {
       ref.invalidate(bibleStudiesCountProvider);
       ref.invalidate(interestedPersonsCountProvider);
 
+      // Invalidate month summary to update Bible studies count on home
+      ref.invalidate(monthSummaryProvider);
+      ref.invalidate(currentMonthSummaryProvider);
+
       return await personDao.getAll();
     });
   }
@@ -66,6 +75,10 @@ class PersonNotifier extends _$PersonNotifier {
       ref.invalidate(interestedPersonsProvider);
       ref.invalidate(bibleStudiesCountProvider);
       ref.invalidate(interestedPersonsCountProvider);
+
+      // Invalidate month summary to update Bible studies count on home
+      ref.invalidate(monthSummaryProvider);
+      ref.invalidate(currentMonthSummaryProvider);
 
       return await personDao.getAll();
     });

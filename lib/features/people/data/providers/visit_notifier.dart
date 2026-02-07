@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../core/database/daos/visit_dao.dart';
 import '../../../../shared/models/visit.dart';
 import '../../../../shared/providers/database_provider.dart';
+import '../../../home/data/providers/month_summary_provider.dart';
 
 part 'visit_notifier.g.dart';
 
@@ -36,6 +37,10 @@ class VisitNotifier extends _$VisitNotifier {
       ref.invalidate(bibleStudiesCountForMonthProvider);
       ref.invalidate(visitCountByPersonProvider);
 
+      // Invalidate month summary to update Bible studies count on home
+      ref.invalidate(monthSummaryProvider);
+      ref.invalidate(currentMonthSummaryProvider);
+
       return await visitDao.getByPerson(_personId);
     });
   }
@@ -53,6 +58,10 @@ class VisitNotifier extends _$VisitNotifier {
       ref.invalidate(bibleStudiesCountForMonthProvider);
       ref.invalidate(visitCountByPersonProvider);
 
+      // Invalidate month summary to update Bible studies count on home
+      ref.invalidate(monthSummaryProvider);
+      ref.invalidate(currentMonthSummaryProvider);
+
       return await visitDao.getByPerson(_personId);
     });
   }
@@ -69,6 +78,10 @@ class VisitNotifier extends _$VisitNotifier {
       ref.invalidate(visitsByMonthProvider);
       ref.invalidate(bibleStudiesCountForMonthProvider);
       ref.invalidate(visitCountByPersonProvider);
+
+      // Invalidate month summary to update Bible studies count on home
+      ref.invalidate(monthSummaryProvider);
+      ref.invalidate(currentMonthSummaryProvider);
 
       return await visitDao.getByPerson(_personId);
     });
