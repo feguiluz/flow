@@ -49,11 +49,16 @@ class _RegisterActivitySheetState extends ConsumerState<RegisterActivitySheet> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
+    final now = DateTime.now();
+    // Only allow selecting dates from the current month
+    final firstDayOfMonth = DateTime(now.year, now.month, 1);
+
     final picked = await showDatePicker(
       context: context,
       initialDate: _selectedDate,
-      firstDate: DateTime(2020),
-      lastDate: DateTime.now().add(const Duration(days: 1)),
+      firstDate: firstDayOfMonth,
+      lastDate: DateTime.now(),
+      helpText: 'Seleccionar fecha del mes actual',
     );
 
     if (picked != null) {

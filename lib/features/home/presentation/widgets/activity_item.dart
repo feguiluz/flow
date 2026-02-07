@@ -57,30 +57,29 @@ class ActivityItem extends ConsumerWidget {
       ),
     );
 
-    if (confirmed == true && context.mounted) {
+    if (confirmed == true) {
+      // Get ScaffoldMessenger before deletion to avoid losing context
+      final scaffoldMessenger = ScaffoldMessenger.of(context);
+
       try {
         await ref
             .read(activityNotifierProvider.notifier)
             .deleteActivity(activity.id!);
 
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Actividad eliminada'),
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
-        }
+        scaffoldMessenger.showSnackBar(
+          const SnackBar(
+            content: Text('Actividad eliminada'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
       } catch (e) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error al eliminar: ${e.toString()}'),
-              backgroundColor: Theme.of(context).colorScheme.error,
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
-        }
+        scaffoldMessenger.showSnackBar(
+          SnackBar(
+            content: Text('Error al eliminar: ${e.toString()}'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
       }
     }
   }

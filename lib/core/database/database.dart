@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -22,8 +23,16 @@ class AppDatabase {
 
   /// Initialize database with schema
   Future<Database> _initDB(String filePath) async {
-    final dbPath = await getDatabasesPath();
-    final path = join(dbPath, filePath);
+    String path;
+
+    if (kIsWeb) {
+      // For web, use a simple database name (stored in IndexedDB)
+      path = filePath;
+    } else {
+      // For mobile/desktop, use the standard databases path
+      final dbPath = await getDatabasesPath();
+      path = join(dbPath, filePath);
+    }
 
     return await openDatabase(
       path,

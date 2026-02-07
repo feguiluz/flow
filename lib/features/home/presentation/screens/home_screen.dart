@@ -89,27 +89,42 @@ class HomeScreen extends ConsumerWidget {
                             ),
                           ),
                           const SizedBox(height: 4),
-                          totalHoursAsync.when(
-                            data: (hours) => Text(
-                              hours.toStringAsFixed(1),
-                              style: theme.textTheme.displaySmall?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: theme.colorScheme.primary,
+                          AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 300),
+                            transitionBuilder: (child, animation) {
+                              return FadeTransition(
+                                opacity: animation,
+                                child: ScaleTransition(
+                                  scale: animation,
+                                  child: child,
+                                ),
+                              );
+                            },
+                            child: totalHoursAsync.when(
+                              data: (hours) => Text(
+                                hours.toStringAsFixed(2),
+                                key: ValueKey(hours),
+                                style: theme.textTheme.displaySmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: theme.colorScheme.primary,
+                                ),
                               ),
-                            ),
-                            loading: () => SizedBox(
-                              height: 36,
-                              width: 36,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 3,
-                                color: theme.colorScheme.primary,
+                              loading: () => SizedBox(
+                                key: const ValueKey('loading'),
+                                height: 36,
+                                width: 36,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 3,
+                                  color: theme.colorScheme.primary,
+                                ),
                               ),
-                            ),
-                            error: (_, __) => Text(
-                              '--',
-                              style: theme.textTheme.displaySmall?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: theme.colorScheme.error,
+                              error: (_, __) => Text(
+                                '--',
+                                key: const ValueKey('error'),
+                                style: theme.textTheme.displaySmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: theme.colorScheme.error,
+                                ),
                               ),
                             ),
                           ),

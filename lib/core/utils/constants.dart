@@ -44,6 +44,6 @@ class AppConstants {
 
   // Validation
   static const double minHours = 0.01;
-  static const double maxHours = 300.0; // Sanity check
+  static const double maxHoursPerDay = 24.0; // Maximum hours in a single day
   static const int maxNoteLength = 500;
 }

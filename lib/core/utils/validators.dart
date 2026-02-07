@@ -19,12 +19,12 @@ class Validators {
       return 'Ingresa un número válido';
     }
 
-    if (hours < AppConstants.minHours) {
-      return 'Las horas deben ser mayor a 0';
+    if (hours <= 0) {
+      return 'Las horas deben ser mayores a 0';
     }
 
-    if (hours > AppConstants.maxHours) {
-      return 'Las horas parecen muy altas. Verifica el valor.';
+    if (hours > AppConstants.maxHoursPerDay) {
+      return 'Las horas no pueden exceder 24 por día';
     }
 
     return null;
