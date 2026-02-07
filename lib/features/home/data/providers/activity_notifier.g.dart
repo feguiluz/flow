@@ -832,7 +832,7 @@ class _ServiceYearTotalUpToProviderElement
   DateTime get upToDate => (origin as ServiceYearTotalUpToProvider).upToDate;
 }
 
-String _$activityNotifierHash() => r'be8d5081e1f962e370eac4d01d437808643cda7e';
+String _$activityNotifierHash() => r'c248016ada54ae7ef757644874d7a1be918ffc18';
 
 /// Provider for managing activity data for the current month
 ///

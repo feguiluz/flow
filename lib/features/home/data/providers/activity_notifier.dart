@@ -33,6 +33,13 @@ class ActivityNotifier extends _$ActivityNotifier {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       await _activityDao.insert(activity);
+
+      // Invalidate all month-specific providers to refresh UI
+      ref.invalidate(activitiesByMonthProvider);
+      ref.invalidate(getTotalMinutesForMonthProvider);
+      ref.invalidate(serviceYearTotalMinutesProvider);
+      ref.invalidate(serviceYearTotalUpToProvider);
+
       final now = DateTime.now();
       return _loadActivities(now.year, now.month);
     });
@@ -43,6 +50,13 @@ class ActivityNotifier extends _$ActivityNotifier {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       await _activityDao.update(activity);
+
+      // Invalidate all month-specific providers to refresh UI
+      ref.invalidate(activitiesByMonthProvider);
+      ref.invalidate(getTotalMinutesForMonthProvider);
+      ref.invalidate(serviceYearTotalMinutesProvider);
+      ref.invalidate(serviceYearTotalUpToProvider);
+
       final now = DateTime.now();
       return _loadActivities(now.year, now.month);
     });
@@ -53,6 +67,13 @@ class ActivityNotifier extends _$ActivityNotifier {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       await _activityDao.delete(id);
+
+      // Invalidate all month-specific providers to refresh UI
+      ref.invalidate(activitiesByMonthProvider);
+      ref.invalidate(getTotalMinutesForMonthProvider);
+      ref.invalidate(serviceYearTotalMinutesProvider);
+      ref.invalidate(serviceYearTotalUpToProvider);
+
       final now = DateTime.now();
       return _loadActivities(now.year, now.month);
     });

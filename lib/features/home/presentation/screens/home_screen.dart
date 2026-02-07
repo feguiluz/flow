@@ -39,15 +39,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(20),
-          ),
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
-        child: const RegisterActivitySheet(),
+        child: RegisterActivitySheet(
+          // Pass the first day of the selected month as initial date
+          initialDate: DateTime(_selectedMonth.year, _selectedMonth.month, 1),
+        ),
       ),
     );
   }

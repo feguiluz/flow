@@ -15,10 +15,14 @@ class RegisterActivitySheet extends ConsumerStatefulWidget {
   const RegisterActivitySheet({
     super.key,
     this.activity,
+    this.initialDate,
   });
 
   /// If provided, the sheet will be in edit mode
   final Activity? activity;
+
+  /// Suggested initial date (e.g., from selected month)
+  final DateTime? initialDate;
 
   @override
   ConsumerState<RegisterActivitySheet> createState() =>
@@ -35,7 +39,9 @@ class _RegisterActivitySheetState extends ConsumerState<RegisterActivitySheet> {
   @override
   void initState() {
     super.initState();
-    _selectedDate = widget.activity?.date ?? DateTime.now();
+    // Use activity date, or initialDate, or today
+    _selectedDate =
+        widget.activity?.date ?? widget.initialDate ?? DateTime.now();
 
     // Initialize time from existing activity
     if (widget.activity != null) {
@@ -57,15 +63,15 @@ class _RegisterActivitySheetState extends ConsumerState<RegisterActivitySheet> {
 
   Future<void> _selectDate(BuildContext context) async {
     final now = DateTime.now();
-    // Only allow selecting dates from the current month
-    final firstDayOfMonth = DateTime(now.year, now.month, 1);
+    // Allow selecting any past date (up to 2 years ago for practical purposes)
+    final firstDate = DateTime(now.year - 2, 1, 1);
 
     final picked = await showDatePicker(
       context: context,
-      initialDate: _selectedDate,
-      firstDate: firstDayOfMonth,
-      lastDate: DateTime.now(),
-      helpText: 'Seleccionar fecha del mes actual',
+      initialDate: _selectedDate.isAfter(now) ? now : _selectedDate,
+      firstDate: firstDate,
+      lastDate: now,
+      helpText: 'Seleccionar fecha',
     );
 
     if (picked != null) {
