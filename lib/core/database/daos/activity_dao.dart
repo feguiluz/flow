@@ -178,6 +178,49 @@ class ActivityDao {
 
   // ==================== Helper Methods ====================
 
+  /// Get total minutes for a service year (Sep - Aug)
+  /// startYear = 2025 means Sep 2025 - Aug 2026
+  Future<int> getTotalMinutesForServiceYear(int startYear) async {
+    final endYear = startYear + 1;
+
+    final result = await db.rawQuery(
+      '''
+      SELECT SUM(minutes) as total 
+      FROM activities 
+      WHERE date >= ? AND date <= ?
+      ''',
+      [
+        '$startYear-09-01', // September 1st of start year
+        '$endYear-08-31', // August 31st of end year
+      ],
+    );
+
+    return (result.first['total'] as num?)?.toInt() ?? 0;
+  }
+
+  /// Get total minutes for a service year UP TO a specific date
+  /// Used for showing accumulated progress
+  /// Example: startYear=2025, upToDate=DateTime(2026,1,31)
+  ///          → Sep 2025 to Jan 2026
+  Future<int> getTotalMinutesForServiceYearUpTo(
+    int startYear,
+    DateTime upToDate,
+  ) async {
+    final startDate = '$startYear-09-01';
+    final endDate = DateFormatter.formatForDb(upToDate);
+
+    final result = await db.rawQuery(
+      '''
+      SELECT SUM(minutes) as total 
+      FROM activities 
+      WHERE date >= ? AND date <= ?
+      ''',
+      [startDate, endDate],
+    );
+
+    return (result.first['total'] as num?)?.toInt() ?? 0;
+  }
+
   /// Map a database row to an Activity object
   Activity _mapToActivity(Map<String, dynamic> map) {
     return Activity(

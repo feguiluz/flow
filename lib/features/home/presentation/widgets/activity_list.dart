@@ -6,11 +6,20 @@ import 'activity_item.dart';
 
 /// Widget displaying a list of activities with loading and error states
 class ActivityList extends ConsumerWidget {
-  const ActivityList({super.key});
+  const ActivityList({
+    super.key,
+    required this.year,
+    required this.month,
+  });
+
+  final int year;
+  final int month;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final activitiesAsync = ref.watch(activityNotifierProvider);
+    final activitiesAsync = ref.watch(
+      activitiesByMonthProvider(year, month),
+    );
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 

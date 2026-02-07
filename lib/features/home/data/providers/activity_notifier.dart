@@ -101,3 +101,37 @@ Future<Map<int, int>> yearlyMinutesByMonth(
   final activityDao = ref.watch(activityDaoProvider);
   return activityDao.getMinutesByMonthForYear(year);
 }
+
+/// Provider for total minutes in a specific month
+@riverpod
+Future<int> getTotalMinutesForMonth(
+  GetTotalMinutesForMonthRef ref, {
+  required int year,
+  required int month,
+}) async {
+  final activityDao = ref.watch(activityDaoProvider);
+  return activityDao.getTotalMinutesByMonth(year, month);
+}
+
+/// Provider for service year total minutes
+/// startYear = 2025 means Sep 2025 - Aug 2026
+@riverpod
+Future<int> serviceYearTotalMinutes(
+  ServiceYearTotalMinutesRef ref,
+  int startYear,
+) async {
+  final activityDao = ref.watch(activityDaoProvider);
+  return activityDao.getTotalMinutesForServiceYear(startYear);
+}
+
+/// Provider for service year total UP TO a specific date
+/// Used for showing accumulated progress
+@riverpod
+Future<int> serviceYearTotalUpTo(
+  ServiceYearTotalUpToRef ref, {
+  required int startYear,
+  required DateTime upToDate,
+}) async {
+  final activityDao = ref.watch(activityDaoProvider);
+  return activityDao.getTotalMinutesForServiceYearUpTo(startYear, upToDate);
+}
