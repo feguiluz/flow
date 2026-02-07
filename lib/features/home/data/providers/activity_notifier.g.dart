@@ -7,7 +7,7 @@ part of 'activity_notifier.dart';
 // **************************************************************************
 
 String _$currentMonthTotalHoursHash() =>
-    r'33e49c252e2ef76e60ce9234ae693bf233fadfa2';
+    r'd09e6ee991fec14ec330a299fd6872dd87b20f9b';
 
 /// Provider for calculating total hours in the current month
 ///

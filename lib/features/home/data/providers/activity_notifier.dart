@@ -66,9 +66,14 @@ class ActivityNotifier extends _$ActivityNotifier {
 /// Provider for calculating total hours in the current month
 @riverpod
 Future<double> currentMonthTotalHours(CurrentMonthTotalHoursRef ref) async {
-  final activityDao = ref.watch(activityDaoProvider);
-  final now = DateTime.now();
-  return activityDao.getTotalHoursByMonth(now.year, now.month);
+  // Watch the activity list to auto-refresh when it changes
+  final activities = await ref.watch(activityNotifierProvider.future);
+
+  // Calculate total from the activities list
+  return activities.fold<double>(
+    0.0,
+    (sum, activity) => sum + activity.hours,
+  );
 }
 
 /// Provider for activities of a specific month
