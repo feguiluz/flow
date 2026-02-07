@@ -27,7 +27,7 @@ final currentMonthTotalMinutesProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CurrentMonthTotalMinutesRef = AutoDisposeFutureProviderRef<int>;
-String _$activitiesByMonthHash() => r'704bc2363d70162d8e696d446d7e300a9729d953';
+String _$activitiesByMonthHash() => r'af481a33207806a3d4354a990e980150b95c877a';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -210,7 +210,7 @@ class _ActivitiesByMonthProviderElement
 }
 
 String _$yearlyMinutesByMonthHash() =>
-    r'88a15e58ec1ccceffcb2fea6379dc1e380018330';
+    r'96f8c4a47446325738832833e59ea7d2f858dde5';
 
 /// Provider for total minutes by month in a specific year
 ///
@@ -355,7 +355,7 @@ class _YearlyMinutesByMonthProviderElement
 }
 
 String _$getTotalMinutesForMonthHash() =>
-    r'8b84969ee0fc0432559ffbda203815a542a1f572';
+    r'f00e0c3ca5351106fe4417dee7e305eca57f7fb8';
 
 /// Provider for total minutes in a specific month
 ///
@@ -516,7 +516,7 @@ class _GetTotalMinutesForMonthProviderElement
 }
 
 String _$serviceYearTotalMinutesHash() =>
-    r'010c758a1c99429bed17a2209c5e798b8e60d546';
+    r'8305b7d1b517f3ca9d934da5673f041b4dd13e37';
 
 /// Provider for service year total minutes
 /// startYear = 2025 means Sep 2025 - Aug 2026
@@ -667,7 +667,7 @@ class _ServiceYearTotalMinutesProviderElement
 }
 
 String _$serviceYearTotalUpToHash() =>
-    r'f567035c2d9c275ac1aaba1fb7b3689d819c551c';
+    r'33ce8adb6edf1682c143425f03f6243d4211f8cd';
 
 /// Provider for service year total UP TO a specific date
 /// Used for showing accumulated progress
@@ -832,7 +832,7 @@ class _ServiceYearTotalUpToProviderElement
   DateTime get upToDate => (origin as ServiceYearTotalUpToProvider).upToDate;
 }
 
-String _$activityNotifierHash() => r'c248016ada54ae7ef757644874d7a1be918ffc18';
+String _$activityNotifierHash() => r'6b29ed7c8cdf432ebdc15c0759a83222e4b2d5db';
 
 /// Provider for managing activity data for the current month
 ///

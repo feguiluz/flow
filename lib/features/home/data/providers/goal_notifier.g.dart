@@ -25,7 +25,7 @@ final currentMonthGoalProvider = AutoDisposeFutureProvider<Goal?>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CurrentMonthGoalRef = AutoDisposeFutureProviderRef<Goal?>;
-String _$goalNotifierHash() => r'3f5d64648858ea4610e89a67fc86d56a1eb81662';
+String _$goalNotifierHash() => r'b2e477363e4446857630afcae247ae4078e6ac1f';
 
 /// Copied from Dart SDK
 class _SystemHash {

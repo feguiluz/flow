@@ -14,7 +14,7 @@ class GoalNotifier extends _$GoalNotifier {
   }
 
   Future<Goal?> _loadGoal(int year, int month) async {
-    final goalDao = ref.read(goalDaoProvider);
+    final goalDao = await ref.read(goalDaoProvider.future);
     return goalDao.getByMonth(year, month);
   }
 
@@ -22,7 +22,7 @@ class GoalNotifier extends _$GoalNotifier {
   Future<void> setGoal(Goal goal) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      final goalDao = ref.read(goalDaoProvider);
+      final goalDao = await ref.read(goalDaoProvider.future);
 
       // Use insertOrUpdate which handles both cases
       final id = await goalDao.insertOrUpdate(goal);
@@ -34,7 +34,7 @@ class GoalNotifier extends _$GoalNotifier {
   Future<void> deleteGoal(int year, int month) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      final goalDao = ref.read(goalDaoProvider);
+      final goalDao = await ref.read(goalDaoProvider.future);
       await goalDao.delete(year, month);
       return null;
     });

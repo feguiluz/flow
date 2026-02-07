@@ -18,7 +18,7 @@ Future<MonthSummary> monthSummary(
   final goal = await ref.watch(goalNotifierProvider(year, month).future);
 
   // Get total hours for the month
-  final activityDao = ref.read(activityDaoProvider);
+  final activityDao = await ref.read(activityDaoProvider.future);
   final activities = await activityDao.getByMonth(year, month);
   final totalHours = activities.fold<double>(
     0.0,
@@ -26,7 +26,7 @@ Future<MonthSummary> monthSummary(
   );
 
   // Get Bible studies count for the month
-  final visitDao = ref.read(visitDaoProvider);
+  final visitDao = await ref.read(visitDaoProvider.future);
   final bibleStudiesCount = await visitDao.countBibleStudiesInMonth(
     year,
     month,

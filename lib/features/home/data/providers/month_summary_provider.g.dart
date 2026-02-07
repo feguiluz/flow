@@ -6,7 +6,7 @@ part of 'month_summary_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$monthSummaryHash() => r'7e01061b89ac0c185563fba3fd156965897972f3';
+String _$monthSummaryHash() => r'1f732bca77732dadad3b2bc38506afcdf9975d59';
 
 /// Copied from Dart SDK
 class _SystemHash {

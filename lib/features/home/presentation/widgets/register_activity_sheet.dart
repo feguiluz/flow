@@ -128,7 +128,7 @@ class _RegisterActivitySheetState extends ConsumerState<RegisterActivitySheet> {
       }
 
       // Validate that total minutes for this day don't exceed 24 hours
-      final activityDao = ref.read(activityDaoProvider);
+      final activityDao = await ref.read(activityDaoProvider.future);
       final existingMinutes = await activityDao.getTotalMinutesForDate(
         _selectedDate,
         excludeActivityId: widget.activity?.id,

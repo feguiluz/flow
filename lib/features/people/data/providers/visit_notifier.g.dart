@@ -6,7 +6,7 @@ part of 'visit_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$visitsByPersonHash() => r'e92edae8b18b56eb498cbed8956fca3ac4a94497';
+String _$visitsByPersonHash() => r'6a18c2ec239ce4b1a1bb119c5bc6e67344505130';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -170,7 +170,7 @@ class _VisitsByPersonProviderElement
   int get personId => (origin as VisitsByPersonProvider).personId;
 }
 
-String _$visitsByMonthHash() => r'057b79f7b9ef1aab78e7d1f21f93d8b27436fb7d';
+String _$visitsByMonthHash() => r'e804973a30da42b3336d045ad90992c5062dc05a';
 
 /// Provider for visits by month
 ///
@@ -331,7 +331,7 @@ class _VisitsByMonthProviderElement
 }
 
 String _$bibleStudiesCountForMonthHash() =>
-    r'7c30d5bb4b4493e0957c97037c9497253a5ad0eb';
+    r'071d0bf51239ce8c6f369e6a43e150751b0e997f';
 
 /// Provider for Bible studies count in a specific month
 /// A Bible study is counted if:
@@ -510,7 +510,7 @@ class _BibleStudiesCountForMonthProviderElement
 }
 
 String _$visitCountByPersonHash() =>
-    r'1882558d07a08f5743acc5b3b05eb91c3ebea843';
+    r'71500102e99a3c6d7cb49b1cc22d93c6ba28e37e';
 
 /// Provider for visit count by person
 ///
@@ -652,7 +652,7 @@ class _VisitCountByPersonProviderElement
   int get personId => (origin as VisitCountByPersonProvider).personId;
 }
 
-String _$visitByIdHash() => r'496970a8758b3d9133a293b124507400e5d74d1f';
+String _$visitByIdHash() => r'612c165dfea2f0f92504ccb50a5d1fa090437da9';
 
 /// Provider for a specific visit by ID
 ///
@@ -793,7 +793,7 @@ class _VisitByIdProviderElement extends AutoDisposeFutureProviderElement<Visit?>
   int get id => (origin as VisitByIdProvider).id;
 }
 
-String _$visitNotifierHash() => r'b3aebf24f8d6b568ccdfefde8ee415dcdbc06803';
+String _$visitNotifierHash() => r'43b19bd3afa3f1e5b948ecbc674a820264cbfcd9';
 
 abstract class _$VisitNotifier
     extends BuildlessAutoDisposeAsyncNotifier<List<Visit>> {

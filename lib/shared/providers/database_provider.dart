@@ -17,40 +17,28 @@ Future<Database> database(DatabaseRef ref) async {
 
 /// Provider for ActivityDao
 @riverpod
-ActivityDao activityDao(ActivityDaoRef ref) {
-  final db = ref.watch(databaseProvider).value;
-  if (db == null) {
-    throw StateError('Database not initialized');
-  }
+Future<ActivityDao> activityDao(ActivityDaoRef ref) async {
+  final db = await ref.watch(databaseProvider.future);
   return ActivityDao(db);
 }
 
 /// Provider for PersonDao
 @riverpod
-PersonDao personDao(PersonDaoRef ref) {
-  final db = ref.watch(databaseProvider).value;
-  if (db == null) {
-    throw StateError('Database not initialized');
-  }
+Future<PersonDao> personDao(PersonDaoRef ref) async {
+  final db = await ref.watch(databaseProvider.future);
   return PersonDao(db);
 }
 
 /// Provider for VisitDao
 @riverpod
-VisitDao visitDao(VisitDaoRef ref) {
-  final db = ref.watch(databaseProvider).value;
-  if (db == null) {
-    throw StateError('Database not initialized');
-  }
+Future<VisitDao> visitDao(VisitDaoRef ref) async {
+  final db = await ref.watch(databaseProvider.future);
   return VisitDao(db);
 }
 
 /// Provider for GoalDao
 @riverpod
-GoalDao goalDao(GoalDaoRef ref) {
-  final db = ref.watch(databaseProvider).value;
-  if (db == null) {
-    throw StateError('Database not initialized');
-  }
+Future<GoalDao> goalDao(GoalDaoRef ref) async {
+  final db = await ref.watch(databaseProvider.future);
   return GoalDao(db);
 }

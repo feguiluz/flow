@@ -14,7 +14,7 @@ class PersonNotifier extends _$PersonNotifier {
   @override
   Future<List<Person>> build() async {
     try {
-      _personDao = ref.watch(personDaoProvider);
+      _personDao = await ref.watch(personDaoProvider.future);
       return await _loadAllPersons();
     } catch (e) {
       // Return empty list on initial load error instead of showing error state
@@ -96,7 +96,7 @@ class PersonNotifier extends _$PersonNotifier {
 @riverpod
 Future<List<Person>> bibleStudies(BibleStudiesRef ref) async {
   try {
-    final personDao = ref.watch(personDaoProvider);
+    final personDao = await ref.watch(personDaoProvider.future);
     return await personDao.getBibleStudies();
   } catch (e) {
     // Return empty list on initial load error instead of showing error state
@@ -108,7 +108,7 @@ Future<List<Person>> bibleStudies(BibleStudiesRef ref) async {
 @riverpod
 Future<List<Person>> interestedPersons(InterestedPersonsRef ref) async {
   try {
-    final personDao = ref.watch(personDaoProvider);
+    final personDao = await ref.watch(personDaoProvider.future);
     return await personDao.getInterestedPersons();
   } catch (e) {
     // Return empty list on initial load error instead of showing error state
@@ -119,20 +119,20 @@ Future<List<Person>> interestedPersons(InterestedPersonsRef ref) async {
 /// Provider for Bible studies count
 @riverpod
 Future<int> bibleStudiesCount(BibleStudiesCountRef ref) async {
-  final personDao = ref.watch(personDaoProvider);
+  final personDao = await ref.watch(personDaoProvider.future);
   return personDao.getBibleStudiesCount();
 }
 
 /// Provider for interested persons count
 @riverpod
 Future<int> interestedPersonsCount(InterestedPersonsCountRef ref) async {
-  final personDao = ref.watch(personDaoProvider);
+  final personDao = await ref.watch(personDaoProvider.future);
   return personDao.getInterestedPersonsCount();
 }
 
 /// Provider for a specific person by ID
 @riverpod
 Future<Person?> personById(PersonByIdRef ref, int id) async {
-  final personDao = ref.watch(personDaoProvider);
+  final personDao = await ref.watch(personDaoProvider.future);
   return personDao.getById(id);
 }

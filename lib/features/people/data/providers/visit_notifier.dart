@@ -15,7 +15,7 @@ class VisitNotifier extends _$VisitNotifier {
   @override
   Future<List<Visit>> build(int personId) async {
     try {
-      _visitDao = ref.watch(visitDaoProvider);
+      _visitDao = await ref.watch(visitDaoProvider.future);
       _personId = personId;
       return await _loadVisits();
     } catch (e) {
@@ -90,7 +90,7 @@ class VisitNotifier extends _$VisitNotifier {
 @riverpod
 Future<List<Visit>> visitsByPerson(VisitsByPersonRef ref, int personId) async {
   try {
-    final visitDao = ref.watch(visitDaoProvider);
+    final visitDao = await ref.watch(visitDaoProvider.future);
     return await visitDao.getByPerson(personId);
   } catch (e) {
     // Return empty list on initial load error instead of showing error state
@@ -106,7 +106,7 @@ Future<List<Visit>> visitsByMonth(
   int month,
 ) async {
   try {
-    final visitDao = ref.watch(visitDaoProvider);
+    final visitDao = await ref.watch(visitDaoProvider.future);
     return await visitDao.getByMonth(year, month);
   } catch (e) {
     // Return empty list on initial load error instead of showing error state
@@ -124,20 +124,20 @@ Future<int> bibleStudiesCountForMonth(
   int year,
   int month,
 ) async {
-  final visitDao = ref.watch(visitDaoProvider);
+  final visitDao = await ref.watch(visitDaoProvider.future);
   return visitDao.countBibleStudiesInMonth(year, month);
 }
 
 /// Provider for visit count by person
 @riverpod
 Future<int> visitCountByPerson(VisitCountByPersonRef ref, int personId) async {
-  final visitDao = ref.watch(visitDaoProvider);
+  final visitDao = await ref.watch(visitDaoProvider.future);
   return visitDao.getVisitCountByPerson(personId);
 }
 
 /// Provider for a specific visit by ID
 @riverpod
 Future<Visit?> visitById(VisitByIdRef ref, int id) async {
-  final visitDao = ref.watch(visitDaoProvider);
+  final visitDao = await ref.watch(visitDaoProvider.future);
   return visitDao.getById(id);
 }

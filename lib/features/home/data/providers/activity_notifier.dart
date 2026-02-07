@@ -9,30 +9,24 @@ part 'activity_notifier.g.dart';
 /// Provider for managing activity data for the current month
 @riverpod
 class ActivityNotifier extends _$ActivityNotifier {
-  late ActivityDao _activityDao;
-
   @override
   Future<List<Activity>> build() async {
     try {
-      _activityDao = ref.watch(activityDaoProvider);
+      final activityDao = await ref.watch(activityDaoProvider.future);
       final now = DateTime.now();
-      return await _loadActivities(now.year, now.month);
+      return await activityDao.getByMonth(now.year, now.month);
     } catch (e) {
       // Return empty list on initial load error instead of showing error state
       return [];
     }
   }
 
-  /// Load activities for a specific month
-  Future<List<Activity>> _loadActivities(int year, int month) async {
-    return _activityDao.getByMonth(year, month);
-  }
-
   /// Add a new activity
   Future<void> addActivity(Activity activity) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      await _activityDao.insert(activity);
+      final activityDao = await ref.read(activityDaoProvider.future);
+      await activityDao.insert(activity);
 
       // Invalidate all month-specific providers to refresh UI
       ref.invalidate(activitiesByMonthProvider);
@@ -41,7 +35,7 @@ class ActivityNotifier extends _$ActivityNotifier {
       ref.invalidate(serviceYearTotalUpToProvider);
 
       final now = DateTime.now();
-      return _loadActivities(now.year, now.month);
+      return activityDao.getByMonth(now.year, now.month);
     });
   }
 
@@ -49,7 +43,8 @@ class ActivityNotifier extends _$ActivityNotifier {
   Future<void> updateActivity(Activity activity) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      await _activityDao.update(activity);
+      final activityDao = await ref.read(activityDaoProvider.future);
+      await activityDao.update(activity);
 
       // Invalidate all month-specific providers to refresh UI
       ref.invalidate(activitiesByMonthProvider);
@@ -58,7 +53,7 @@ class ActivityNotifier extends _$ActivityNotifier {
       ref.invalidate(serviceYearTotalUpToProvider);
 
       final now = DateTime.now();
-      return _loadActivities(now.year, now.month);
+      return activityDao.getByMonth(now.year, now.month);
     });
   }
 
@@ -66,7 +61,8 @@ class ActivityNotifier extends _$ActivityNotifier {
   Future<void> deleteActivity(int id) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      await _activityDao.delete(id);
+      final activityDao = await ref.read(activityDaoProvider.future);
+      await activityDao.delete(id);
 
       // Invalidate all month-specific providers to refresh UI
       ref.invalidate(activitiesByMonthProvider);
@@ -75,7 +71,7 @@ class ActivityNotifier extends _$ActivityNotifier {
       ref.invalidate(serviceYearTotalUpToProvider);
 
       final now = DateTime.now();
-      return _loadActivities(now.year, now.month);
+      return activityDao.getByMonth(now.year, now.month);
     });
   }
 
@@ -84,7 +80,8 @@ class ActivityNotifier extends _$ActivityNotifier {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final now = DateTime.now();
-      return _loadActivities(now.year, now.month);
+      final activityDao = await ref.read(activityDaoProvider.future);
+      return activityDao.getByMonth(now.year, now.month);
     });
   }
 }
@@ -110,7 +107,7 @@ Future<List<Activity>> activitiesByMonth(
   int month,
 ) async {
   try {
-    final activityDao = ref.watch(activityDaoProvider);
+    final activityDao = await ref.watch(activityDaoProvider.future);
     return await activityDao.getByMonth(year, month);
   } catch (e) {
     // Return empty list on initial load error instead of showing error state
@@ -124,7 +121,7 @@ Future<Map<int, int>> yearlyMinutesByMonth(
   YearlyMinutesByMonthRef ref,
   int year,
 ) async {
-  final activityDao = ref.watch(activityDaoProvider);
+  final activityDao = await ref.watch(activityDaoProvider.future);
   return activityDao.getMinutesByMonthForYear(year);
 }
 
@@ -135,7 +132,7 @@ Future<int> getTotalMinutesForMonth(
   required int year,
   required int month,
 }) async {
-  final activityDao = ref.watch(activityDaoProvider);
+  final activityDao = await ref.watch(activityDaoProvider.future);
   return activityDao.getTotalMinutesByMonth(year, month);
 }
 
@@ -146,7 +143,7 @@ Future<int> serviceYearTotalMinutes(
   ServiceYearTotalMinutesRef ref,
   int startYear,
 ) async {
-  final activityDao = ref.watch(activityDaoProvider);
+  final activityDao = await ref.watch(activityDaoProvider.future);
   return activityDao.getTotalMinutesForServiceYear(startYear);
 }
 
@@ -158,6 +155,6 @@ Future<int> serviceYearTotalUpTo(
   required int startYear,
   required DateTime upToDate,
 }) async {
-  final activityDao = ref.watch(activityDaoProvider);
+  final activityDao = await ref.watch(activityDaoProvider.future);
   return activityDao.getTotalMinutesForServiceYearUpTo(startYear, upToDate);
 }

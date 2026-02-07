@@ -6,7 +6,7 @@ part of 'person_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$bibleStudiesHash() => r'27064fb7d76e8b787be9f5fbb186965dd916bea7';
+String _$bibleStudiesHash() => r'05e54e04ee2f1091fe8103c0fe153a3943b71581';
 
 /// Provider for Bible studies only
 ///
@@ -24,7 +24,7 @@ final bibleStudiesProvider = AutoDisposeFutureProvider<List<Person>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef BibleStudiesRef = AutoDisposeFutureProviderRef<List<Person>>;
-String _$interestedPersonsHash() => r'a09a858037ba3745478f16b8b7947a165042c049';
+String _$interestedPersonsHash() => r'ed547be3e4882da10d0a0262c0a208fdc5d0bc8b';
 
 /// Provider for interested persons only (not Bible studies)
 ///
@@ -44,7 +44,7 @@ final interestedPersonsProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef InterestedPersonsRef = AutoDisposeFutureProviderRef<List<Person>>;
-String _$bibleStudiesCountHash() => r'a39efb0e1c4bec26924cd84ef10c5667a935997a';
+String _$bibleStudiesCountHash() => r'95424bec4313ba3647a975437b6b39a053a6ec22';
 
 /// Provider for Bible studies count
 ///
@@ -64,7 +64,7 @@ final bibleStudiesCountProvider = AutoDisposeFutureProvider<int>.internal(
 // ignore: unused_element
 typedef BibleStudiesCountRef = AutoDisposeFutureProviderRef<int>;
 String _$interestedPersonsCountHash() =>
-    r'2d7497250b196a3c5d207ccec76f3608ddfc1eef';
+    r'22566b227eb174829ce4adf099705a0f335c7a57';
 
 /// Provider for interested persons count
 ///
@@ -83,7 +83,7 @@ final interestedPersonsCountProvider = AutoDisposeFutureProvider<int>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef InterestedPersonsCountRef = AutoDisposeFutureProviderRef<int>;
-String _$personByIdHash() => r'3731aa6fe3ca054d0e2670dde8ace36c0b549522';
+String _$personByIdHash() => r'20dee7c9a3be465f3708a6270ff2f7bdf5c8b7e3';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -246,7 +246,7 @@ class _PersonByIdProviderElement
   int get id => (origin as PersonByIdProvider).id;
 }
 
-String _$personNotifierHash() => r'6738497238eb5597d1946f611723b72e6cdec505';
+String _$personNotifierHash() => r'954e0b52a696e410159e858ccec0973f83190cd2';
 
 /// Provider for managing person data (Bible studies and interested persons)
 ///
