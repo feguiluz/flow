@@ -9,31 +9,26 @@ part 'visit_notifier.g.dart';
 /// Provider for managing visit data for a specific person
 @riverpod
 class VisitNotifier extends _$VisitNotifier {
-  late VisitDao _visitDao;
   late int _personId;
 
   @override
   Future<List<Visit>> build(int personId) async {
     try {
-      _visitDao = await ref.watch(visitDaoProvider.future);
       _personId = personId;
-      return await _loadVisits();
+      final visitDao = await ref.watch(visitDaoProvider.future);
+      return await visitDao.getByPerson(_personId);
     } catch (e) {
       // Return empty list on initial load error instead of showing error state
       return [];
     }
   }
 
-  /// Load visits for the person
-  Future<List<Visit>> _loadVisits() async {
-    return _visitDao.getByPerson(_personId);
-  }
-
   /// Add a new visit
   Future<void> addVisit(Visit visit) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      await _visitDao.insert(visit);
+      final visitDao = await ref.read(visitDaoProvider.future);
+      await visitDao.insert(visit);
 
       // Invalidate all visit-related providers to refresh UI
       ref.invalidate(visitsByPersonProvider);
@@ -41,7 +36,7 @@ class VisitNotifier extends _$VisitNotifier {
       ref.invalidate(bibleStudiesCountForMonthProvider);
       ref.invalidate(visitCountByPersonProvider);
 
-      return _loadVisits();
+      return await visitDao.getByPerson(_personId);
     });
   }
 
@@ -49,7 +44,8 @@ class VisitNotifier extends _$VisitNotifier {
   Future<void> updateVisit(Visit visit) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      await _visitDao.update(visit);
+      final visitDao = await ref.read(visitDaoProvider.future);
+      await visitDao.update(visit);
 
       // Invalidate all visit-related providers to refresh UI
       ref.invalidate(visitsByPersonProvider);
@@ -57,7 +53,7 @@ class VisitNotifier extends _$VisitNotifier {
       ref.invalidate(bibleStudiesCountForMonthProvider);
       ref.invalidate(visitCountByPersonProvider);
 
-      return _loadVisits();
+      return await visitDao.getByPerson(_personId);
     });
   }
 
@@ -65,7 +61,8 @@ class VisitNotifier extends _$VisitNotifier {
   Future<void> deleteVisit(int id) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      await _visitDao.delete(id);
+      final visitDao = await ref.read(visitDaoProvider.future);
+      await visitDao.delete(id);
 
       // Invalidate all visit-related providers to refresh UI
       ref.invalidate(visitsByPersonProvider);
@@ -73,7 +70,7 @@ class VisitNotifier extends _$VisitNotifier {
       ref.invalidate(bibleStudiesCountForMonthProvider);
       ref.invalidate(visitCountByPersonProvider);
 
-      return _loadVisits();
+      return await visitDao.getByPerson(_personId);
     });
   }
 
@@ -81,7 +78,8 @@ class VisitNotifier extends _$VisitNotifier {
   Future<void> refresh() async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      return _loadVisits();
+      final visitDao = await ref.read(visitDaoProvider.future);
+      return await visitDao.getByPerson(_personId);
     });
   }
 }

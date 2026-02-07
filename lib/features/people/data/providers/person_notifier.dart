@@ -9,29 +9,23 @@ part 'person_notifier.g.dart';
 /// Provider for managing person data (Bible studies and interested persons)
 @riverpod
 class PersonNotifier extends _$PersonNotifier {
-  late PersonDao _personDao;
-
   @override
   Future<List<Person>> build() async {
     try {
-      _personDao = await ref.watch(personDaoProvider.future);
-      return await _loadAllPersons();
+      final personDao = await ref.watch(personDaoProvider.future);
+      return await personDao.getAll();
     } catch (e) {
       // Return empty list on initial load error instead of showing error state
       return [];
     }
   }
 
-  /// Load all persons
-  Future<List<Person>> _loadAllPersons() async {
-    return _personDao.getAll();
-  }
-
   /// Add a new person
   Future<void> addPerson(Person person) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      await _personDao.insert(person);
+      final personDao = await ref.read(personDaoProvider.future);
+      await personDao.insert(person);
 
       // Invalidate all person-related providers to refresh UI
       ref.invalidate(bibleStudiesProvider);
@@ -39,7 +33,7 @@ class PersonNotifier extends _$PersonNotifier {
       ref.invalidate(bibleStudiesCountProvider);
       ref.invalidate(interestedPersonsCountProvider);
 
-      return _loadAllPersons();
+      return await personDao.getAll();
     });
   }
 
@@ -47,7 +41,8 @@ class PersonNotifier extends _$PersonNotifier {
   Future<void> updatePerson(Person person) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      await _personDao.update(person);
+      final personDao = await ref.read(personDaoProvider.future);
+      await personDao.update(person);
 
       // Invalidate all person-related providers to refresh UI
       ref.invalidate(bibleStudiesProvider);
@@ -55,7 +50,7 @@ class PersonNotifier extends _$PersonNotifier {
       ref.invalidate(bibleStudiesCountProvider);
       ref.invalidate(interestedPersonsCountProvider);
 
-      return _loadAllPersons();
+      return await personDao.getAll();
     });
   }
 
@@ -63,7 +58,8 @@ class PersonNotifier extends _$PersonNotifier {
   Future<void> deletePerson(int id) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      await _personDao.delete(id);
+      final personDao = await ref.read(personDaoProvider.future);
+      await personDao.delete(id);
 
       // Invalidate all person-related providers to refresh UI
       ref.invalidate(bibleStudiesProvider);
@@ -71,7 +67,7 @@ class PersonNotifier extends _$PersonNotifier {
       ref.invalidate(bibleStudiesCountProvider);
       ref.invalidate(interestedPersonsCountProvider);
 
-      return _loadAllPersons();
+      return await personDao.getAll();
     });
   }
 
@@ -79,16 +75,18 @@ class PersonNotifier extends _$PersonNotifier {
   Future<void> refresh() async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      return _loadAllPersons();
+      final personDao = await ref.read(personDaoProvider.future);
+      return await personDao.getAll();
     });
   }
 
   /// Search persons by name
   Future<List<Person>> searchPersons(String query) async {
+    final personDao = await ref.read(personDaoProvider.future);
     if (query.isEmpty) {
-      return await _loadAllPersons();
+      return await personDao.getAll();
     }
-    return _personDao.search(query);
+    return personDao.search(query);
   }
 }
 
