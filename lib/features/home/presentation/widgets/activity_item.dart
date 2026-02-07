@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/utils/date_formatter.dart';
 import '../../../../core/utils/time_formatter.dart';
 import '../../../../shared/models/activity.dart';
+import '../../../../shared/widgets/app_banner.dart';
 import '../../data/providers/activity_notifier.dart';
 import 'register_activity_sheet.dart';
 
@@ -59,28 +60,18 @@ class ActivityItem extends ConsumerWidget {
     );
 
     if (confirmed == true) {
-      // Get ScaffoldMessenger before deletion to avoid losing context
-      final scaffoldMessenger = ScaffoldMessenger.of(context);
-
       try {
         await ref
             .read(activityNotifierProvider.notifier)
             .deleteActivity(activity.id!);
 
-        scaffoldMessenger.showSnackBar(
-          const SnackBar(
-            content: Text('Actividad eliminada'),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        if (context.mounted) {
+          AppBanner.showSuccess(context, 'Actividad eliminada');
+        }
       } catch (e) {
-        scaffoldMessenger.showSnackBar(
-          SnackBar(
-            content: Text('Error al eliminar: ${e.toString()}'),
-            backgroundColor: Theme.of(context).colorScheme.error,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        if (context.mounted) {
+          AppBanner.showError(context, 'Error al eliminar: ${e.toString()}');
+        }
       }
     }
   }

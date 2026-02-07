@@ -8,6 +8,7 @@ import '../../../../core/utils/time_formatter.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../../shared/models/activity.dart';
 import '../../../../shared/providers/database_provider.dart';
+import '../../../../shared/widgets/app_banner.dart';
 import '../../data/providers/activity_notifier.dart';
 
 /// Bottom sheet for registering or editing activity hours
@@ -110,12 +111,7 @@ class _RegisterActivitySheetState extends ConsumerState<RegisterActivitySheet> {
 
     // Validate that time has been selected
     if (_selectedTime == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Por favor selecciona el tiempo'),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      AppBanner.showError(context, 'Por favor selecciona el tiempo');
       return;
     }
 
@@ -175,15 +171,11 @@ class _RegisterActivitySheetState extends ConsumerState<RegisterActivitySheet> {
 
       if (mounted) {
         Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              widget.activity == null
-                  ? 'Actividad registrada'
-                  : 'Actividad actualizada',
-            ),
-            behavior: SnackBarBehavior.floating,
-          ),
+        AppBanner.showSuccess(
+          context,
+          widget.activity == null
+              ? 'Actividad registrada'
+              : 'Actividad actualizada',
         );
       }
     } catch (e) {
@@ -191,13 +183,7 @@ class _RegisterActivitySheetState extends ConsumerState<RegisterActivitySheet> {
         setState(() {
           _isLoading = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: ${e.toString()}'),
-            backgroundColor: Theme.of(context).colorScheme.error,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        AppBanner.showError(context, e.toString());
       }
     }
   }
