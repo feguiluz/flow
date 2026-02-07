@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-/// Helper class for showing app-wide banners
+/// Helper class for showing app-wide overlay notifications
 class AppBanner {
   AppBanner._();
 
-  /// Show a success banner at the top of the screen
+  /// Show a success notification at the top of the screen
   static void showSuccess(BuildContext context, String message) {
-    _showBanner(
+    _showOverlay(
       context,
       message: message,
       icon: Icons.check_circle_outline,
@@ -15,9 +15,9 @@ class AppBanner {
     );
   }
 
-  /// Show an error banner at the top of the screen
+  /// Show an error notification at the top of the screen
   static void showError(BuildContext context, String message) {
-    _showBanner(
+    _showOverlay(
       context,
       message: message,
       icon: Icons.error_outline,
@@ -26,9 +26,9 @@ class AppBanner {
     );
   }
 
-  /// Show an info banner at the top of the screen
+  /// Show an info notification at the top of the screen
   static void showInfo(BuildContext context, String message) {
-    _showBanner(
+    _showOverlay(
       context,
       message: message,
       icon: Icons.info_outline,
@@ -37,56 +37,134 @@ class AppBanner {
     );
   }
 
-  /// Internal method to show a banner
-  static void _showBanner(
+  /// Internal method to show an overlay notification
+  static void _showOverlay(
     BuildContext context, {
     required String message,
     required IconData icon,
     required Color backgroundColor,
     required Color foregroundColor,
   }) {
-    // Remove any existing banner first
-    ScaffoldMessenger.of(context).clearMaterialBanners();
+    final overlay = Overlay.of(context);
+    late OverlayEntry overlayEntry;
 
-    ScaffoldMessenger.of(context).showMaterialBanner(
-      MaterialBanner(
-        content: Row(
-          children: [
-            Icon(icon, color: foregroundColor, size: 20),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                message,
-                style: TextStyle(
-                  color: foregroundColor,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ],
-        ),
+    overlayEntry = OverlayEntry(
+      builder: (context) => _BannerWidget(
+        message: message,
+        icon: icon,
         backgroundColor: backgroundColor,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        leading: const SizedBox.shrink(),
-        actions: [
-          TextButton(
-            onPressed: () {
-              ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
-            },
-            child: Text(
-              'OK',
-              style: TextStyle(color: foregroundColor),
-            ),
-          ),
-        ],
+        foregroundColor: foregroundColor,
+        onDismiss: () => overlayEntry.remove(),
       ),
     );
 
-    // Auto-dismiss after 3 seconds
-    Future.delayed(const Duration(seconds: 3), () {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
+    overlay.insert(overlayEntry);
+
+    // Auto-dismiss after 2 seconds
+    Future.delayed(const Duration(seconds: 2), () {
+      if (overlayEntry.mounted) {
+        overlayEntry.remove();
       }
     });
+  }
+}
+
+/// Internal widget for displaying the banner notification
+class _BannerWidget extends StatefulWidget {
+  const _BannerWidget({
+    required this.message,
+    required this.icon,
+    required this.backgroundColor,
+    required this.foregroundColor,
+    required this.onDismiss,
+  });
+
+  final String message;
+  final IconData icon;
+  final Color backgroundColor;
+  final Color foregroundColor;
+  final VoidCallback onDismiss;
+
+  @override
+  State<_BannerWidget> createState() => _BannerWidgetState();
+}
+
+class _BannerWidgetState extends State<_BannerWidget>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, -1),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOut,
+    ));
+
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _dismiss() async {
+    await _controller.reverse();
+    widget.onDismiss();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      top: MediaQuery.of(context).padding.top + 8,
+      left: 16,
+      right: 16,
+      child: SlideTransition(
+        position: _slideAnimation,
+        child: Material(
+          elevation: 6,
+          borderRadius: BorderRadius.circular(12),
+          color: widget.backgroundColor,
+          child: InkWell(
+            onTap: _dismiss,
+            borderRadius: BorderRadius.circular(12),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                children: [
+                  Icon(
+                    widget.icon,
+                    color: widget.foregroundColor,
+                    size: 24,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      widget.message,
+                      style: TextStyle(
+                        color: widget.foregroundColor,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
