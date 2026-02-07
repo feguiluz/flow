@@ -11,7 +11,6 @@ class Visit with _$Visit {
     required int personId,
     required DateTime date,
     String? notes,
-    required bool countedAsStudy,
     required DateTime createdAt,
   }) = _Visit;
 

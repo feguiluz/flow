@@ -40,7 +40,7 @@ class AppDatabase {
 
     final db = await openDatabase(
       path,
-      version: 2, // Incremented for migration to minutes
+      version: 4, // Incremented to add location fields
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
       onConfigure: _onConfigure,
@@ -59,11 +59,11 @@ class AppDatabase {
 
   /// Upgrade database schema
   Future<void> _upgradeDB(Database db, int oldVersion, int newVersion) async {
+    // ignore: avoid_print
+    print('📦 Migrating database from v$oldVersion to v$newVersion');
+
     if (oldVersion < 2) {
       // Migration from version 1 to 2: Change hours (REAL) to minutes (INTEGER)
-      // ignore: avoid_print
-      print('📦 Migrating database from v$oldVersion to v$newVersion');
-
       // 1. Create new table with minutes
       await db.execute('''
         CREATE TABLE activities_new (
@@ -89,8 +89,56 @@ class AppDatabase {
       await db.execute('ALTER TABLE activities_new RENAME TO activities');
 
       // ignore: avoid_print
-      print('✅ Migration completed successfully');
+      print('✅ Migration to v2 completed');
     }
+
+    if (oldVersion < 3) {
+      // Migration from version 2 to 3: Remove counted_as_study from visits
+      // 1. Create new visits table without counted_as_study
+      await db.execute('''
+        CREATE TABLE visits_new (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          person_id INTEGER NOT NULL,
+          date TEXT NOT NULL,
+          notes TEXT,
+          created_at TEXT NOT NULL,
+          FOREIGN KEY (person_id) REFERENCES people (id) ON DELETE CASCADE
+        )
+      ''');
+
+      // 2. Copy data (all visits, regardless of counted_as_study value)
+      await db.execute('''
+        INSERT INTO visits_new (id, person_id, date, notes, created_at)
+        SELECT id, person_id, date, notes, created_at
+        FROM visits
+      ''');
+
+      // 3. Drop old table
+      await db.execute('DROP TABLE visits');
+
+      // 4. Rename new table
+      await db.execute('ALTER TABLE visits_new RENAME TO visits');
+
+      // 5. Recreate indexes
+      await db.execute('CREATE INDEX idx_visits_person ON visits(person_id)');
+      await db.execute('CREATE INDEX idx_visits_date ON visits(date)');
+
+      // ignore: avoid_print
+      print('✅ Migration to v3 completed');
+    }
+
+    if (oldVersion < 4) {
+      // Migration from version 3 to 4: Add location fields to people
+      // SQLite doesn't support multiple ADD COLUMN in one statement
+      await db.execute('ALTER TABLE people ADD COLUMN latitude REAL');
+      await db.execute('ALTER TABLE people ADD COLUMN longitude REAL');
+
+      // ignore: avoid_print
+      print('✅ Migration to v4 completed');
+    }
+
+    // ignore: avoid_print
+    print('✅ All migrations completed successfully');
   }
 
   /// Create database schema
@@ -115,6 +163,8 @@ class AppDatabase {
         address TEXT,
         notes TEXT,
         is_bible_study INTEGER NOT NULL DEFAULT 0,
+        latitude REAL,
+        longitude REAL,
         created_at TEXT NOT NULL
       )
     ''');
@@ -126,7 +176,6 @@ class AppDatabase {
         person_id INTEGER NOT NULL,
         date TEXT NOT NULL,
         notes TEXT,
-        counted_as_study INTEGER NOT NULL DEFAULT 0,
         created_at TEXT NOT NULL,
         FOREIGN KEY (person_id) REFERENCES people (id) ON DELETE CASCADE
       )

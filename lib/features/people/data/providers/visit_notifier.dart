@@ -1,0 +1,143 @@
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../../../core/database/daos/visit_dao.dart';
+import '../../../../shared/models/visit.dart';
+import '../../../../shared/providers/database_provider.dart';
+
+part 'visit_notifier.g.dart';
+
+/// Provider for managing visit data for a specific person
+@riverpod
+class VisitNotifier extends _$VisitNotifier {
+  late VisitDao _visitDao;
+  late int _personId;
+
+  @override
+  Future<List<Visit>> build(int personId) async {
+    try {
+      _visitDao = ref.watch(visitDaoProvider);
+      _personId = personId;
+      return await _loadVisits();
+    } catch (e) {
+      // Return empty list on initial load error instead of showing error state
+      return [];
+    }
+  }
+
+  /// Load visits for the person
+  Future<List<Visit>> _loadVisits() async {
+    return _visitDao.getByPerson(_personId);
+  }
+
+  /// Add a new visit
+  Future<void> addVisit(Visit visit) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      await _visitDao.insert(visit);
+
+      // Invalidate all visit-related providers to refresh UI
+      ref.invalidate(visitsByPersonProvider);
+      ref.invalidate(visitsByMonthProvider);
+      ref.invalidate(bibleStudiesCountForMonthProvider);
+      ref.invalidate(visitCountByPersonProvider);
+
+      return _loadVisits();
+    });
+  }
+
+  /// Update an existing visit
+  Future<void> updateVisit(Visit visit) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      await _visitDao.update(visit);
+
+      // Invalidate all visit-related providers to refresh UI
+      ref.invalidate(visitsByPersonProvider);
+      ref.invalidate(visitsByMonthProvider);
+      ref.invalidate(bibleStudiesCountForMonthProvider);
+      ref.invalidate(visitCountByPersonProvider);
+
+      return _loadVisits();
+    });
+  }
+
+  /// Delete a visit
+  Future<void> deleteVisit(int id) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      await _visitDao.delete(id);
+
+      // Invalidate all visit-related providers to refresh UI
+      ref.invalidate(visitsByPersonProvider);
+      ref.invalidate(visitsByMonthProvider);
+      ref.invalidate(bibleStudiesCountForMonthProvider);
+      ref.invalidate(visitCountByPersonProvider);
+
+      return _loadVisits();
+    });
+  }
+
+  /// Refresh visits for the person
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      return _loadVisits();
+    });
+  }
+}
+
+/// Provider for visits by person
+@riverpod
+Future<List<Visit>> visitsByPerson(VisitsByPersonRef ref, int personId) async {
+  try {
+    final visitDao = ref.watch(visitDaoProvider);
+    return await visitDao.getByPerson(personId);
+  } catch (e) {
+    // Return empty list on initial load error instead of showing error state
+    return [];
+  }
+}
+
+/// Provider for visits by month
+@riverpod
+Future<List<Visit>> visitsByMonth(
+  VisitsByMonthRef ref,
+  int year,
+  int month,
+) async {
+  try {
+    final visitDao = ref.watch(visitDaoProvider);
+    return await visitDao.getByMonth(year, month);
+  } catch (e) {
+    // Return empty list on initial load error instead of showing error state
+    return [];
+  }
+}
+
+/// Provider for Bible studies count in a specific month
+/// A Bible study is counted if:
+/// - The person has is_bible_study = true
+/// - AND they had at least one visit that month
+@riverpod
+Future<int> bibleStudiesCountForMonth(
+  BibleStudiesCountForMonthRef ref,
+  int year,
+  int month,
+) async {
+  final visitDao = ref.watch(visitDaoProvider);
+  return visitDao.countBibleStudiesInMonth(year, month);
+}
+
+/// Provider for visit count by person
+@riverpod
+Future<int> visitCountByPerson(VisitCountByPersonRef ref, int personId) async {
+  final visitDao = ref.watch(visitDaoProvider);
+  return visitDao.getVisitCountByPerson(personId);
+}
+
+/// Provider for a specific visit by ID
+@riverpod
+Future<Visit?> visitById(VisitByIdRef ref, int id) async {
+  final visitDao = ref.watch(visitDaoProvider);
+  return visitDao.getById(id);
+}

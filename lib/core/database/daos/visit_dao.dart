@@ -19,7 +19,6 @@ class VisitDao {
         'person_id': visit.personId,
         'date': DateFormatter.formatForDb(visit.date),
         'notes': visit.notes,
-        'counted_as_study': visit.countedAsStudy ? 1 : 0,
         'created_at': DateFormatter.formatForDb(visit.createdAt),
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
@@ -38,7 +37,6 @@ class VisitDao {
         'person_id': visit.personId,
         'date': DateFormatter.formatForDb(visit.date),
         'notes': visit.notes,
-        'counted_as_study': visit.countedAsStudy ? 1 : 0,
         'created_at': DateFormatter.formatForDb(visit.createdAt),
       },
       where: 'id = ?',
@@ -191,7 +189,6 @@ class VisitDao {
       personId: map['person_id'] as int,
       date: DateFormatter.parseFromDb(map['date'] as String),
       notes: map['notes'] as String?,
-      countedAsStudy: (map['counted_as_study'] as int) == 1,
       createdAt: DateFormatter.parseFromDb(map['created_at'] as String),
     );
   }

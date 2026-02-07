@@ -1,0 +1,138 @@
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../../../core/database/daos/person_dao.dart';
+import '../../../../shared/models/person.dart';
+import '../../../../shared/providers/database_provider.dart';
+
+part 'person_notifier.g.dart';
+
+/// Provider for managing person data (Bible studies and interested persons)
+@riverpod
+class PersonNotifier extends _$PersonNotifier {
+  late PersonDao _personDao;
+
+  @override
+  Future<List<Person>> build() async {
+    try {
+      _personDao = ref.watch(personDaoProvider);
+      return await _loadAllPersons();
+    } catch (e) {
+      // Return empty list on initial load error instead of showing error state
+      return [];
+    }
+  }
+
+  /// Load all persons
+  Future<List<Person>> _loadAllPersons() async {
+    return _personDao.getAll();
+  }
+
+  /// Add a new person
+  Future<void> addPerson(Person person) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      await _personDao.insert(person);
+
+      // Invalidate all person-related providers to refresh UI
+      ref.invalidate(bibleStudiesProvider);
+      ref.invalidate(interestedPersonsProvider);
+      ref.invalidate(bibleStudiesCountProvider);
+      ref.invalidate(interestedPersonsCountProvider);
+
+      return _loadAllPersons();
+    });
+  }
+
+  /// Update an existing person
+  Future<void> updatePerson(Person person) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      await _personDao.update(person);
+
+      // Invalidate all person-related providers to refresh UI
+      ref.invalidate(bibleStudiesProvider);
+      ref.invalidate(interestedPersonsProvider);
+      ref.invalidate(bibleStudiesCountProvider);
+      ref.invalidate(interestedPersonsCountProvider);
+
+      return _loadAllPersons();
+    });
+  }
+
+  /// Delete a person (and all their visits due to CASCADE)
+  Future<void> deletePerson(int id) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      await _personDao.delete(id);
+
+      // Invalidate all person-related providers to refresh UI
+      ref.invalidate(bibleStudiesProvider);
+      ref.invalidate(interestedPersonsProvider);
+      ref.invalidate(bibleStudiesCountProvider);
+      ref.invalidate(interestedPersonsCountProvider);
+
+      return _loadAllPersons();
+    });
+  }
+
+  /// Refresh all persons
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      return _loadAllPersons();
+    });
+  }
+
+  /// Search persons by name
+  Future<List<Person>> searchPersons(String query) async {
+    if (query.isEmpty) {
+      return await _loadAllPersons();
+    }
+    return _personDao.search(query);
+  }
+}
+
+/// Provider for Bible studies only
+@riverpod
+Future<List<Person>> bibleStudies(BibleStudiesRef ref) async {
+  try {
+    final personDao = ref.watch(personDaoProvider);
+    return await personDao.getBibleStudies();
+  } catch (e) {
+    // Return empty list on initial load error instead of showing error state
+    return [];
+  }
+}
+
+/// Provider for interested persons only (not Bible studies)
+@riverpod
+Future<List<Person>> interestedPersons(InterestedPersonsRef ref) async {
+  try {
+    final personDao = ref.watch(personDaoProvider);
+    return await personDao.getInterestedPersons();
+  } catch (e) {
+    // Return empty list on initial load error instead of showing error state
+    return [];
+  }
+}
+
+/// Provider for Bible studies count
+@riverpod
+Future<int> bibleStudiesCount(BibleStudiesCountRef ref) async {
+  final personDao = ref.watch(personDaoProvider);
+  return personDao.getBibleStudiesCount();
+}
+
+/// Provider for interested persons count
+@riverpod
+Future<int> interestedPersonsCount(InterestedPersonsCountRef ref) async {
+  final personDao = ref.watch(personDaoProvider);
+  return personDao.getInterestedPersonsCount();
+}
+
+/// Provider for a specific person by ID
+@riverpod
+Future<Person?> personById(PersonByIdRef ref, int id) async {
+  final personDao = ref.watch(personDaoProvider);
+  return personDao.getById(id);
+}

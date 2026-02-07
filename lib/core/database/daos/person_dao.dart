@@ -21,6 +21,8 @@ class PersonDao {
         'address': person.address,
         'notes': person.notes,
         'is_bible_study': person.isBibleStudy ? 1 : 0,
+        'latitude': person.latitude,
+        'longitude': person.longitude,
         'created_at': DateFormatter.formatForDb(person.createdAt),
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
@@ -41,6 +43,8 @@ class PersonDao {
         'address': person.address,
         'notes': person.notes,
         'is_bible_study': person.isBibleStudy ? 1 : 0,
+        'latitude': person.latitude,
+        'longitude': person.longitude,
         'created_at': DateFormatter.formatForDb(person.createdAt),
       },
       where: 'id = ?',
@@ -150,6 +154,8 @@ class PersonDao {
       address: map['address'] as String?,
       notes: map['notes'] as String?,
       isBibleStudy: (map['is_bible_study'] as int) == 1,
+      latitude: map['latitude'] as double?,
+      longitude: map['longitude'] as double?,
       createdAt: DateFormatter.parseFromDb(map['created_at'] as String),
     );
   }

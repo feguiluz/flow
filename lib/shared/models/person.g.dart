@@ -13,6 +13,8 @@ _$PersonImpl _$$PersonImplFromJson(Map<String, dynamic> json) => _$PersonImpl(
       address: json['address'] as String?,
       notes: json['notes'] as String?,
       isBibleStudy: json['isBibleStudy'] as bool,
+      latitude: (json['latitude'] as num?)?.toDouble(),
+      longitude: (json['longitude'] as num?)?.toDouble(),
       createdAt: DateTime.parse(json['createdAt'] as String),
     );
 
@@ -24,5 +26,7 @@ Map<String, dynamic> _$$PersonImplToJson(_$PersonImpl instance) =>
       'address': instance.address,
       'notes': instance.notes,
       'isBibleStudy': instance.isBibleStudy,
+      'latitude': instance.latitude,
+      'longitude': instance.longitude,
       'createdAt': instance.createdAt.toIso8601String(),
     };

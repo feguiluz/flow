@@ -11,7 +11,6 @@ _$VisitImpl _$$VisitImplFromJson(Map<String, dynamic> json) => _$VisitImpl(
       personId: (json['personId'] as num).toInt(),
       date: DateTime.parse(json['date'] as String),
       notes: json['notes'] as String?,
-      countedAsStudy: json['countedAsStudy'] as bool,
       createdAt: DateTime.parse(json['createdAt'] as String),
     );
 
@@ -21,6 +20,5 @@ Map<String, dynamic> _$$VisitImplToJson(_$VisitImpl instance) =>
       'personId': instance.personId,
       'date': instance.date.toIso8601String(),
       'notes': instance.notes,
-      'countedAsStudy': instance.countedAsStudy,
       'createdAt': instance.createdAt.toIso8601String(),
     };
