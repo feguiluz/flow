@@ -354,12 +354,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
 
           // Service year section (expandable)
-          AnimatedSize(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-            child: _isExpanded
-                ? _buildServiceYearSection(theme, colorScheme)
-                : const SizedBox.shrink(),
+          ClipRect(
+            child: AnimatedAlign(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              heightFactor: _isExpanded ? 1.0 : 0.0,
+              alignment: Alignment.topCenter,
+              child: _buildServiceYearSection(theme, colorScheme),
+            ),
           ),
         ],
       ),
