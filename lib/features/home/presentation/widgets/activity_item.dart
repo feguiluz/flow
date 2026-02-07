@@ -5,6 +5,7 @@ import '../../../../core/utils/date_formatter.dart';
 import '../../../../core/utils/time_formatter.dart';
 import '../../../../shared/models/activity.dart';
 import '../../../../shared/widgets/app_banner.dart';
+import '../../../../shared/widgets/confirmation_dialog.dart';
 import '../../data/providers/activity_notifier.dart';
 import 'register_activity_sheet.dart';
 
@@ -35,28 +36,13 @@ class ActivityItem extends ConsumerWidget {
   }
 
   Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Eliminar actividad'),
-        content: const Text(
-          '¿Estás seguro de que deseas eliminar esta actividad? '
+    final confirmed = await ConfirmationDialog.show(
+      context,
+      title: 'Eliminar actividad',
+      message: '¿Estás seguro de que deseas eliminar esta actividad? '
           'Esta acción no se puede deshacer.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: FilledButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.error,
-            ),
-            child: const Text('Eliminar'),
-          ),
-        ],
-      ),
+      confirmText: 'Eliminar',
+      isDestructive: true,
     );
 
     if (confirmed == true) {
