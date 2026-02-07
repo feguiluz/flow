@@ -111,6 +111,26 @@ class ActivityDao {
     return (total as num?)?.toInt() ?? 0;
   }
 
+  /// Get total minutes for a specific date (excluding a specific activity ID)
+  /// Used to validate that total minutes per day doesn't exceed 24 hours
+  Future<int> getTotalMinutesForDate(DateTime date,
+      {int? excludeActivityId}) async {
+    final dateStr = DateFormatter.formatForDb(date);
+
+    String query =
+        'SELECT SUM(minutes) as total FROM activities WHERE date = ?';
+    List<dynamic> args = [dateStr];
+
+    if (excludeActivityId != null) {
+      query += ' AND id != ?';
+      args.add(excludeActivityId);
+    }
+
+    final result = await db.rawQuery(query, args);
+    final total = result.first['total'];
+    return (total as num?)?.toInt() ?? 0;
+  }
+
   /// Get minutes by month for an entire year
   /// Returns a map of {month: minutes} (e.g., {1: 2730, 2: 1800, 3: 3000})
   Future<Map<int, int>> getMinutesByMonthForYear(int year) async {

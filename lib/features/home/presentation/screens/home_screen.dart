@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/date_formatter.dart';
+import '../../../../core/utils/time_formatter.dart';
 import '../../data/providers/activity_notifier.dart';
 import '../widgets/activity_list.dart';
 import '../widgets/register_activity_sheet.dart';
@@ -36,7 +37,7 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final now = DateTime.now();
-    final totalHoursAsync = ref.watch(currentMonthTotalHoursProvider);
+    final totalMinutesAsync = ref.watch(currentMonthTotalMinutesProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -100,10 +101,11 @@ class HomeScreen extends ConsumerWidget {
                                 ),
                               );
                             },
-                            child: totalHoursAsync.when(
-                              data: (hours) => Text(
-                                hours.toStringAsFixed(2),
-                                key: ValueKey(hours),
+                            child: totalMinutesAsync.when(
+                              data: (minutes) => Text(
+                                TimeFormatter.formatMinutesToHoursMinutes(
+                                    minutes),
+                                key: ValueKey(minutes),
                                 style: theme.textTheme.displaySmall?.copyWith(
                                   fontWeight: FontWeight.bold,
                                   color: theme.colorScheme.primary,

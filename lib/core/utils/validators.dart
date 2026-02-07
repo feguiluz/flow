@@ -1,13 +1,38 @@
 import 'package:flow/shared/models/goal.dart';
 
 import 'constants.dart';
+import 'time_formatter.dart';
 
 /// Utility class for input validation
 class Validators {
   // Private constructor to prevent instantiation
   Validators._();
 
-  /// Validate hours input
+  /// Validate time in HH:MM format
+  static String? validateTimeHHMM(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Por favor ingresa el tiempo';
+    }
+
+    final minutes = TimeFormatter.parseHHMMToMinutes(value);
+
+    if (minutes == null) {
+      return 'Formato inválido. Usa HH:MM (ej: 02:30)';
+    }
+
+    if (minutes == 0) {
+      return 'El tiempo debe ser mayor a 0';
+    }
+
+    if (minutes > AppConstants.maxHoursPerDay * 60) {
+      return 'El tiempo no puede exceder 24h';
+    }
+
+    return null;
+  }
+
+  /// Validate hours input (deprecated - use validateTimeHHMM)
+  @Deprecated('Use validateTimeHHMM instead')
   static String? validateHours(String? value) {
     if (value == null || value.isEmpty) {
       return 'Por favor ingresa las horas';

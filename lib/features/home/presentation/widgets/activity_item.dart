@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/date_formatter.dart';
+import '../../../../core/utils/time_formatter.dart';
 import '../../../../shared/models/activity.dart';
 import '../../data/providers/activity_notifier.dart';
 import 'register_activity_sheet.dart';
@@ -140,7 +141,8 @@ class ActivityItem extends ConsumerWidget {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          '${activity.hours} hora${activity.hours == 1 ? '' : 's'}',
+                          TimeFormatter.formatMinutesToHoursMinutes(
+                              activity.minutes),
                           style: theme.textTheme.titleMedium?.copyWith(
                             color: colorScheme.primary,
                             fontWeight: FontWeight.w600,

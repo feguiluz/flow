@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/utils/constants.dart';
 import '../../../../core/utils/date_formatter.dart';
+import '../../../../core/utils/time_formatter.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../../shared/models/activity.dart';
+import '../../../../shared/providers/database_provider.dart';
 import '../../data/providers/activity_notifier.dart';
 
 /// Bottom sheet for registering or editing activity hours
@@ -25,7 +28,7 @@ class RegisterActivitySheet extends ConsumerStatefulWidget {
 class _RegisterActivitySheetState extends ConsumerState<RegisterActivitySheet> {
   final _formKey = GlobalKey<FormState>();
   late DateTime _selectedDate;
-  late TextEditingController _hoursController;
+  late TextEditingController _timeController; // Changed from _hoursController
   late TextEditingController _notesController;
   bool _isLoading = false;
 
@@ -33,8 +36,11 @@ class _RegisterActivitySheetState extends ConsumerState<RegisterActivitySheet> {
   void initState() {
     super.initState();
     _selectedDate = widget.activity?.date ?? DateTime.now();
-    _hoursController = TextEditingController(
-      text: widget.activity?.hours.toString() ?? '',
+    // Initialize with HH:MM format
+    _timeController = TextEditingController(
+      text: widget.activity != null
+          ? TimeFormatter.formatMinutesToHHMM(widget.activity!.minutes)
+          : '',
     );
     _notesController = TextEditingController(
       text: widget.activity?.notes ?? '',
@@ -43,7 +49,7 @@ class _RegisterActivitySheetState extends ConsumerState<RegisterActivitySheet> {
 
   @override
   void dispose() {
-    _hoursController.dispose();
+    _timeController.dispose();
     _notesController.dispose();
     super.dispose();
   }
@@ -78,13 +84,44 @@ class _RegisterActivitySheetState extends ConsumerState<RegisterActivitySheet> {
     });
 
     try {
-      final hours = double.parse(_hoursController.text.trim());
+      // Parse HH:MM format to minutes
+      final minutes =
+          TimeFormatter.parseHHMMToMinutes(_timeController.text.trim());
+
+      if (minutes == null) {
+        throw FormatException('Formato de tiempo inválido');
+      }
+
+      // Validate that total minutes for this day don't exceed 24 hours
+      final activityDao = ref.read(activityDaoProvider);
+      final existingMinutes = await activityDao.getTotalMinutesForDate(
+        _selectedDate,
+        excludeActivityId: widget.activity?.id,
+      );
+
+      final totalMinutes = existingMinutes + minutes;
+      final maxMinutesPerDay = AppConstants.maxHoursPerDay * 60;
+
+      if (totalMinutes > maxMinutesPerDay) {
+        final existingTime =
+            TimeFormatter.formatMinutesToHoursMinutes(existingMinutes);
+        final newTime = TimeFormatter.formatMinutesToHoursMinutes(minutes);
+        final totalTime =
+            TimeFormatter.formatMinutesToHoursMinutes(totalMinutes);
+
+        throw FormatException(
+          'Este día ya tiene $existingTime registrado. '
+          'No puedes agregar $newTime (total: $totalTime). '
+          'Máximo permitido: 24h por día.',
+        );
+      }
+
       final notes = _notesController.text.trim();
 
       final activity = Activity(
         id: widget.activity?.id,
         date: _selectedDate,
-        hours: hours,
+        minutes: minutes,
         notes: notes.isEmpty ? null : notes,
         createdAt: widget.activity?.createdAt ?? DateTime.now(),
       );
@@ -182,23 +219,24 @@ class _RegisterActivitySheetState extends ConsumerState<RegisterActivitySheet> {
             ),
             const SizedBox(height: 16),
 
-            // Hours input
+            // Time input (HH:MM format)
             TextFormField(
-              controller: _hoursController,
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
+              controller: _timeController,
+              keyboardType: TextInputType.number,
               inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                FilteringTextInputFormatter.allow(RegExp(r'[0-9:]')),
+                LengthLimitingTextInputFormatter(5), // HH:MM = 5 chars max
               ],
               decoration: InputDecoration(
-                labelText: 'Horas',
-                hintText: '0.0',
+                labelText: 'Tiempo (HH:MM)',
+                hintText: '02:30',
+                helperText: 'Formato: HH:MM (ejemplo: 02:30)',
                 prefixIcon: const Icon(Icons.access_time),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              validator: Validators.validateHours,
+              validator: Validators.validateTimeHHMM,
               enabled: !_isLoading,
             ),
             const SizedBox(height: 16),

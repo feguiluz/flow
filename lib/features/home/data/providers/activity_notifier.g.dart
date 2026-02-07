@@ -6,27 +6,27 @@ part of 'activity_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$currentMonthTotalHoursHash() =>
-    r'd09e6ee991fec14ec330a299fd6872dd87b20f9b';
+String _$currentMonthTotalMinutesHash() =>
+    r'f4a451e2d1e7ad2a51f8bd46278935bcbaf7fc87';
 
-/// Provider for calculating total hours in the current month
+/// Provider for calculating total minutes in the current month
 ///
-/// Copied from [currentMonthTotalHours].
-@ProviderFor(currentMonthTotalHours)
-final currentMonthTotalHoursProvider =
-    AutoDisposeFutureProvider<double>.internal(
-  currentMonthTotalHours,
-  name: r'currentMonthTotalHoursProvider',
+/// Copied from [currentMonthTotalMinutes].
+@ProviderFor(currentMonthTotalMinutes)
+final currentMonthTotalMinutesProvider =
+    AutoDisposeFutureProvider<int>.internal(
+  currentMonthTotalMinutes,
+  name: r'currentMonthTotalMinutesProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$currentMonthTotalHoursHash,
+      : _$currentMonthTotalMinutesHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef CurrentMonthTotalHoursRef = AutoDisposeFutureProviderRef<double>;
+typedef CurrentMonthTotalMinutesRef = AutoDisposeFutureProviderRef<int>;
 String _$activitiesByMonthHash() => r'ca4930a0d34a751d44f62d9051cfcd0b1049de42';
 
 /// Copied from Dart SDK
@@ -209,38 +209,38 @@ class _ActivitiesByMonthProviderElement
   int get month => (origin as ActivitiesByMonthProvider).month;
 }
 
-String _$yearlyHoursByMonthHash() =>
-    r'a5d4e3457fae9c088fb3f310e48f5148bd69428c';
+String _$yearlyMinutesByMonthHash() =>
+    r'88a15e58ec1ccceffcb2fea6379dc1e380018330';
 
-/// Provider for total hours by month in a specific year
+/// Provider for total minutes by month in a specific year
 ///
-/// Copied from [yearlyHoursByMonth].
-@ProviderFor(yearlyHoursByMonth)
-const yearlyHoursByMonthProvider = YearlyHoursByMonthFamily();
+/// Copied from [yearlyMinutesByMonth].
+@ProviderFor(yearlyMinutesByMonth)
+const yearlyMinutesByMonthProvider = YearlyMinutesByMonthFamily();
 
-/// Provider for total hours by month in a specific year
+/// Provider for total minutes by month in a specific year
 ///
-/// Copied from [yearlyHoursByMonth].
-class YearlyHoursByMonthFamily extends Family<AsyncValue<Map<int, double>>> {
-  /// Provider for total hours by month in a specific year
+/// Copied from [yearlyMinutesByMonth].
+class YearlyMinutesByMonthFamily extends Family<AsyncValue<Map<int, int>>> {
+  /// Provider for total minutes by month in a specific year
   ///
-  /// Copied from [yearlyHoursByMonth].
-  const YearlyHoursByMonthFamily();
+  /// Copied from [yearlyMinutesByMonth].
+  const YearlyMinutesByMonthFamily();
 
-  /// Provider for total hours by month in a specific year
+  /// Provider for total minutes by month in a specific year
   ///
-  /// Copied from [yearlyHoursByMonth].
-  YearlyHoursByMonthProvider call(
+  /// Copied from [yearlyMinutesByMonth].
+  YearlyMinutesByMonthProvider call(
     int year,
   ) {
-    return YearlyHoursByMonthProvider(
+    return YearlyMinutesByMonthProvider(
       year,
     );
   }
 
   @override
-  YearlyHoursByMonthProvider getProviderOverride(
-    covariant YearlyHoursByMonthProvider provider,
+  YearlyMinutesByMonthProvider getProviderOverride(
+    covariant YearlyMinutesByMonthProvider provider,
   ) {
     return call(
       provider.year,
@@ -259,37 +259,37 @@ class YearlyHoursByMonthFamily extends Family<AsyncValue<Map<int, double>>> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'yearlyHoursByMonthProvider';
+  String? get name => r'yearlyMinutesByMonthProvider';
 }
 
-/// Provider for total hours by month in a specific year
+/// Provider for total minutes by month in a specific year
 ///
-/// Copied from [yearlyHoursByMonth].
-class YearlyHoursByMonthProvider
-    extends AutoDisposeFutureProvider<Map<int, double>> {
-  /// Provider for total hours by month in a specific year
+/// Copied from [yearlyMinutesByMonth].
+class YearlyMinutesByMonthProvider
+    extends AutoDisposeFutureProvider<Map<int, int>> {
+  /// Provider for total minutes by month in a specific year
   ///
-  /// Copied from [yearlyHoursByMonth].
-  YearlyHoursByMonthProvider(
+  /// Copied from [yearlyMinutesByMonth].
+  YearlyMinutesByMonthProvider(
     int year,
   ) : this._internal(
-          (ref) => yearlyHoursByMonth(
-            ref as YearlyHoursByMonthRef,
+          (ref) => yearlyMinutesByMonth(
+            ref as YearlyMinutesByMonthRef,
             year,
           ),
-          from: yearlyHoursByMonthProvider,
-          name: r'yearlyHoursByMonthProvider',
+          from: yearlyMinutesByMonthProvider,
+          name: r'yearlyMinutesByMonthProvider',
           debugGetCreateSourceHash:
               const bool.fromEnvironment('dart.vm.product')
                   ? null
-                  : _$yearlyHoursByMonthHash,
-          dependencies: YearlyHoursByMonthFamily._dependencies,
+                  : _$yearlyMinutesByMonthHash,
+          dependencies: YearlyMinutesByMonthFamily._dependencies,
           allTransitiveDependencies:
-              YearlyHoursByMonthFamily._allTransitiveDependencies,
+              YearlyMinutesByMonthFamily._allTransitiveDependencies,
           year: year,
         );
 
-  YearlyHoursByMonthProvider._internal(
+  YearlyMinutesByMonthProvider._internal(
     super._createNotifier, {
     required super.name,
     required super.dependencies,
@@ -303,12 +303,12 @@ class YearlyHoursByMonthProvider
 
   @override
   Override overrideWith(
-    FutureOr<Map<int, double>> Function(YearlyHoursByMonthRef provider) create,
+    FutureOr<Map<int, int>> Function(YearlyMinutesByMonthRef provider) create,
   ) {
     return ProviderOverride(
       origin: this,
-      override: YearlyHoursByMonthProvider._internal(
-        (ref) => create(ref as YearlyHoursByMonthRef),
+      override: YearlyMinutesByMonthProvider._internal(
+        (ref) => create(ref as YearlyMinutesByMonthRef),
         from: from,
         name: null,
         dependencies: null,
@@ -320,13 +320,13 @@ class YearlyHoursByMonthProvider
   }
 
   @override
-  AutoDisposeFutureProviderElement<Map<int, double>> createElement() {
-    return _YearlyHoursByMonthProviderElement(this);
+  AutoDisposeFutureProviderElement<Map<int, int>> createElement() {
+    return _YearlyMinutesByMonthProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is YearlyHoursByMonthProvider && other.year == year;
+    return other is YearlyMinutesByMonthProvider && other.year == year;
   }
 
   @override
@@ -340,18 +340,18 @@ class YearlyHoursByMonthProvider
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin YearlyHoursByMonthRef on AutoDisposeFutureProviderRef<Map<int, double>> {
+mixin YearlyMinutesByMonthRef on AutoDisposeFutureProviderRef<Map<int, int>> {
   /// The parameter `year` of this provider.
   int get year;
 }
 
-class _YearlyHoursByMonthProviderElement
-    extends AutoDisposeFutureProviderElement<Map<int, double>>
-    with YearlyHoursByMonthRef {
-  _YearlyHoursByMonthProviderElement(super.provider);
+class _YearlyMinutesByMonthProviderElement
+    extends AutoDisposeFutureProviderElement<Map<int, int>>
+    with YearlyMinutesByMonthRef {
+  _YearlyMinutesByMonthProviderElement(super.provider);
 
   @override
-  int get year => (origin as YearlyHoursByMonthProvider).year;
+  int get year => (origin as YearlyMinutesByMonthProvider).year;
 }
 
 String _$activityNotifierHash() => r'be8d5081e1f962e370eac4d01d437808643cda7e';
