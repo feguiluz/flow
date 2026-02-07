@@ -17,7 +17,7 @@ class AppDatabase {
   /// Get database instance, creating it if it doesn't exist
   Future<Database> get database async {
     if (_database != null) return _database!;
-    _database = await _initDB('flow.db');
+    _database = await _initDB(kIsWeb ? 'flow_app.db' : 'flow.db');
     return _database!;
   }
 
@@ -28,18 +28,26 @@ class AppDatabase {
     if (kIsWeb) {
       // For web, use a simple database name (stored in IndexedDB)
       path = filePath;
+      // ignore: avoid_print
+      print('📦 Opening database for web: $path');
     } else {
       // For mobile/desktop, use the standard databases path
       final dbPath = await getDatabasesPath();
       path = join(dbPath, filePath);
+      // ignore: avoid_print
+      print('📦 Opening database at: $path');
     }
 
-    return await openDatabase(
+    final db = await openDatabase(
       path,
       version: 1,
       onCreate: _createDB,
       onConfigure: _onConfigure,
     );
+
+    // ignore: avoid_print
+    print('✅ Database opened successfully');
+    return db;
   }
 
   /// Configure database settings

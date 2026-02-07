@@ -13,7 +13,7 @@ void main() async {
 
   // Initialize sqflite for web and desktop platforms
   if (kIsWeb) {
-    // Web platform
+    // Web platform - use IndexedDB for persistence
     databaseFactory = databaseFactoryFfiWeb;
   } else if (defaultTargetPlatform == TargetPlatform.windows ||
       defaultTargetPlatform == TargetPlatform.linux ||
