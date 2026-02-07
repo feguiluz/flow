@@ -28,7 +28,7 @@ class RegisterActivitySheet extends ConsumerStatefulWidget {
 class _RegisterActivitySheetState extends ConsumerState<RegisterActivitySheet> {
   final _formKey = GlobalKey<FormState>();
   late DateTime _selectedDate;
-  late TextEditingController _timeController; // Changed from _hoursController
+  TimeOfDay? _selectedTime; // Time selected with TimePicker
   late TextEditingController _notesController;
   bool _isLoading = false;
 
@@ -36,12 +36,14 @@ class _RegisterActivitySheetState extends ConsumerState<RegisterActivitySheet> {
   void initState() {
     super.initState();
     _selectedDate = widget.activity?.date ?? DateTime.now();
-    // Initialize with HH:MM format
-    _timeController = TextEditingController(
-      text: widget.activity != null
-          ? TimeFormatter.formatMinutesToHHMM(widget.activity!.minutes)
-          : '',
-    );
+
+    // Initialize time from existing activity
+    if (widget.activity != null) {
+      final hours = TimeFormatter.getHours(widget.activity!.minutes);
+      final minutes = TimeFormatter.getMinutes(widget.activity!.minutes);
+      _selectedTime = TimeOfDay(hour: hours, minute: minutes);
+    }
+
     _notesController = TextEditingController(
       text: widget.activity?.notes ?? '',
     );
@@ -49,7 +51,6 @@ class _RegisterActivitySheetState extends ConsumerState<RegisterActivitySheet> {
 
   @override
   void dispose() {
-    _timeController.dispose();
     _notesController.dispose();
     super.dispose();
   }
@@ -74,8 +75,41 @@ class _RegisterActivitySheetState extends ConsumerState<RegisterActivitySheet> {
     }
   }
 
+  Future<void> _selectTime(BuildContext context) async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: _selectedTime ?? const TimeOfDay(hour: 0, minute: 0),
+      helpText: 'Seleccionar tiempo',
+      hourLabelText: 'Horas',
+      minuteLabelText: 'Minutos',
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      setState(() {
+        _selectedTime = picked;
+      });
+    }
+  }
+
   Future<void> _saveActivity() async {
     if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    // Validate that time has been selected
+    if (_selectedTime == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Por favor selecciona el tiempo'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
       return;
     }
 
@@ -84,12 +118,11 @@ class _RegisterActivitySheetState extends ConsumerState<RegisterActivitySheet> {
     });
 
     try {
-      // Parse HH:MM format to minutes
-      final minutes =
-          TimeFormatter.parseHHMMToMinutes(_timeController.text.trim());
+      // Convert TimeOfDay to total minutes
+      final minutes = (_selectedTime!.hour * 60) + _selectedTime!.minute;
 
-      if (minutes == null) {
-        throw FormatException('Formato de tiempo inválido');
+      if (minutes == 0) {
+        throw FormatException('El tiempo debe ser mayor a 0');
       }
 
       // Validate that total minutes for this day don't exceed 24 hours
@@ -219,25 +252,31 @@ class _RegisterActivitySheetState extends ConsumerState<RegisterActivitySheet> {
             ),
             const SizedBox(height: 16),
 
-            // Time input (HH:MM format)
-            TextFormField(
-              controller: _timeController,
-              keyboardType: TextInputType.number,
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'[0-9:]')),
-                LengthLimitingTextInputFormatter(5), // HH:MM = 5 chars max
-              ],
-              decoration: InputDecoration(
-                labelText: 'Tiempo (HH:MM)',
-                hintText: '02:30',
-                helperText: 'Formato: HH:MM (ejemplo: 02:30)',
-                prefixIcon: const Icon(Icons.access_time),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+            // Time selector
+            InkWell(
+              onTap: _isLoading ? null : () => _selectTime(context),
+              borderRadius: BorderRadius.circular(12),
+              child: InputDecorator(
+                decoration: InputDecoration(
+                  labelText: 'Tiempo',
+                  prefixIcon: const Icon(Icons.access_time),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  _selectedTime != null
+                      ? TimeFormatter.formatMinutesToHoursMinutes(
+                          (_selectedTime!.hour * 60) + _selectedTime!.minute,
+                        )
+                      : 'Seleccionar tiempo',
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color: _selectedTime != null
+                        ? theme.textTheme.bodyLarge?.color
+                        : theme.hintColor,
+                  ),
                 ),
               ),
-              validator: Validators.validateTimeHHMM,
-              enabled: !_isLoading,
             ),
             const SizedBox(height: 16),
 
