@@ -339,10 +339,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                   ),
                   const SizedBox(width: 4),
-                  Icon(
-                    _isExpanded ? Icons.expand_less : Icons.expand_more,
-                    size: 20,
-                    color: colorScheme.onSurfaceVariant,
+                  AnimatedRotation(
+                    turns: _isExpanded ? 0.5 : 0,
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                    child: const Icon(
+                      Icons.expand_more,
+                      size: 20,
+                    ),
                   ),
                 ],
               ),
@@ -350,13 +354,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
 
           // Service year section (expandable)
-          AnimatedCrossFade(
+          AnimatedSize(
             duration: const Duration(milliseconds: 300),
-            crossFadeState: _isExpanded
-                ? CrossFadeState.showSecond
-                : CrossFadeState.showFirst,
-            firstChild: const SizedBox.shrink(),
-            secondChild: _buildServiceYearSection(theme, colorScheme),
+            curve: Curves.easeInOut,
+            child: _isExpanded
+                ? _buildServiceYearSection(theme, colorScheme)
+                : const SizedBox.shrink(),
           ),
         ],
       ),
