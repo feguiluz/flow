@@ -109,8 +109,13 @@ Future<List<Activity>> activitiesByMonth(
   int year,
   int month,
 ) async {
-  final activityDao = ref.watch(activityDaoProvider);
-  return activityDao.getByMonth(year, month);
+  try {
+    final activityDao = ref.watch(activityDaoProvider);
+    return await activityDao.getByMonth(year, month);
+  } catch (e) {
+    // Return empty list on initial load error instead of showing error state
+    return [];
+  }
 }
 
 /// Provider for total minutes by month in a specific year

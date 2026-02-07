@@ -27,7 +27,7 @@ final currentMonthTotalMinutesProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CurrentMonthTotalMinutesRef = AutoDisposeFutureProviderRef<int>;
-String _$activitiesByMonthHash() => r'ca4930a0d34a751d44f62d9051cfcd0b1049de42';
+String _$activitiesByMonthHash() => r'704bc2363d70162d8e696d446d7e300a9729d953';
 
 /// Copied from Dart SDK
 class _SystemHash {
