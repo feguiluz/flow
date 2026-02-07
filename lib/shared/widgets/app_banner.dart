@@ -47,6 +47,7 @@ class AppBanner {
   }) {
     final overlay = Overlay.of(context);
     late OverlayEntry overlayEntry;
+    late _BannerWidgetState bannerState;
 
     overlayEntry = OverlayEntry(
       builder: (context) => _BannerWidget(
@@ -55,15 +56,16 @@ class AppBanner {
         backgroundColor: backgroundColor,
         foregroundColor: foregroundColor,
         onDismiss: () => overlayEntry.remove(),
+        onStateCreated: (state) => bannerState = state,
       ),
     );
 
     overlay.insert(overlayEntry);
 
-    // Auto-dismiss after 2 seconds
-    Future.delayed(const Duration(seconds: 2), () {
+    // Auto-dismiss after 2 seconds with animation
+    Future.delayed(const Duration(seconds: 2), () async {
       if (overlayEntry.mounted) {
-        overlayEntry.remove();
+        await bannerState.dismiss();
       }
     });
   }
@@ -77,6 +79,7 @@ class _BannerWidget extends StatefulWidget {
     required this.backgroundColor,
     required this.foregroundColor,
     required this.onDismiss,
+    required this.onStateCreated,
   });
 
   final String message;
@@ -84,6 +87,7 @@ class _BannerWidget extends StatefulWidget {
   final Color backgroundColor;
   final Color foregroundColor;
   final VoidCallback onDismiss;
+  final void Function(_BannerWidgetState state) onStateCreated;
 
   @override
   State<_BannerWidget> createState() => _BannerWidgetState();
@@ -111,6 +115,9 @@ class _BannerWidgetState extends State<_BannerWidget>
     ));
 
     _controller.forward();
+
+    // Notify parent that state is created
+    widget.onStateCreated(this);
   }
 
   @override
@@ -119,7 +126,8 @@ class _BannerWidgetState extends State<_BannerWidget>
     super.dispose();
   }
 
-  Future<void> _dismiss() async {
+  /// Dismiss the banner with animation
+  Future<void> dismiss() async {
     await _controller.reverse();
     widget.onDismiss();
   }
@@ -137,7 +145,7 @@ class _BannerWidgetState extends State<_BannerWidget>
           borderRadius: BorderRadius.circular(12),
           color: widget.backgroundColor,
           child: InkWell(
-            onTap: _dismiss,
+            onTap: dismiss,
             borderRadius: BorderRadius.circular(12),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
