@@ -21,8 +21,21 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  void _showRegisterSheet() {
+  late DateTime _selectedMonth;
+
+  @override
+  void initState() {
+    super.initState();
     final now = DateTime.now();
+    _selectedMonth = DateTime(now.year, now.month);
+  }
+
+  void _showRegisterSheet() {
+    // If selected month is current month, use today; otherwise use first day of month
+    final now = DateTime.now();
+    final initialDate = _isCurrentMonth()
+        ? now
+        : DateTime(_selectedMonth.year, _selectedMonth.month, 1);
 
     showModalBottomSheet<void>(
       context: context,
@@ -32,16 +45,44 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
         child: RegisterActivitySheet(
-          initialDate: now,
+          initialDate: initialDate,
         ),
       ),
     );
   }
 
+  void _goToPreviousMonth() {
+    setState(() {
+      _selectedMonth = DateTime(
+        _selectedMonth.year,
+        _selectedMonth.month - 1,
+      );
+    });
+  }
+
+  void _goToNextMonth() {
+    final now = DateTime.now();
+    final currentMonth = DateTime(now.year, now.month);
+
+    // Only allow going forward if not in current month
+    if (_selectedMonth.isBefore(currentMonth)) {
+      setState(() {
+        _selectedMonth = DateTime(
+          _selectedMonth.year,
+          _selectedMonth.month + 1,
+        );
+      });
+    }
+  }
+
+  bool _isCurrentMonth() {
+    final now = DateTime.now();
+    return _selectedMonth.year == now.year && _selectedMonth.month == now.month;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final now = DateTime.now();
 
     return Scaffold(
       appBar: AppBar(
@@ -50,10 +91,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       body: Column(
         children: [
+          // Month navigation
+          _buildMonthNavigator(theme),
+
           // Month Summary Card with goal progress
-          const Padding(
-            padding: EdgeInsets.all(16.0),
-            child: MonthSummaryCard(),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: MonthSummaryCard(
+              year: _selectedMonth.year,
+              month: _selectedMonth.month,
+            ),
           ),
 
           // Divider
@@ -93,9 +140,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 );
               },
               child: ActivityList(
-                key: ValueKey('${now.year}-${now.month}'),
-                year: now.year,
-                month: now.month,
+                key: ValueKey('${_selectedMonth.year}-${_selectedMonth.month}'),
+                year: _selectedMonth.year,
+                month: _selectedMonth.month,
               ),
             ),
           ),
@@ -108,5 +155,85 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         tooltip: 'Registrar horas',
       ),
     );
+  }
+
+  Widget _buildMonthNavigator(ThemeData theme) {
+    final colorScheme = theme.colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Previous month button
+          IconButton(
+            icon: const Icon(Icons.chevron_left),
+            onPressed: _goToPreviousMonth,
+            tooltip: 'Mes anterior',
+          ),
+
+          // Month display with badge
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  _getMonthYearText(),
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                if (_isCurrentMonth()) ...[
+                  const SizedBox(height: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      'Mes actual',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: colorScheme.onPrimaryContainer,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+
+          // Next month button (disabled if current month)
+          IconButton(
+            icon: const Icon(Icons.chevron_right),
+            onPressed: _isCurrentMonth() ? null : _goToNextMonth,
+            tooltip: _isCurrentMonth() ? null : 'Mes siguiente',
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getMonthYearText() {
+    const months = [
+      'Enero',
+      'Febrero',
+      'Marzo',
+      'Abril',
+      'Mayo',
+      'Junio',
+      'Julio',
+      'Agosto',
+      'Septiembre',
+      'Octubre',
+      'Noviembre',
+      'Diciembre'
+    ];
+    return '${months[_selectedMonth.month - 1]} ${_selectedMonth.year}';
   }
 }

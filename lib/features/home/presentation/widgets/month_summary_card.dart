@@ -9,11 +9,25 @@ import 'goal_selector_dialog.dart';
 
 /// Card displaying monthly summary with goal progress
 class MonthSummaryCard extends ConsumerWidget {
-  const MonthSummaryCard({super.key});
+  const MonthSummaryCard({
+    super.key,
+    this.year,
+    this.month,
+  });
+
+  final int? year;
+  final int? month;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final summaryAsync = ref.watch(currentMonthSummaryProvider);
+    // Use provided year/month or default to current month
+    final now = DateTime.now();
+    final targetYear = year ?? now.year;
+    final targetMonth = month ?? now.month;
+
+    final summaryAsync = ref.watch(
+      monthSummaryProvider(targetYear, targetMonth),
+    );
 
     return summaryAsync.when(
       data: (summary) => _buildCard(context, ref, summary),
