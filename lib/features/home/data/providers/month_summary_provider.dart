@@ -25,12 +25,10 @@ Future<MonthSummary> monthSummary(
     (sum, activity) => sum + activity.minutes / 60.0,
   );
 
-  // Get Bible studies count for the month
-  final visitDao = await ref.read(visitDaoProvider.future);
-  final bibleStudiesCount = await visitDao.countBibleStudiesInMonth(
-    year,
-    month,
-  );
+  // Get Bible studies count
+  // Count all persons marked as isBibleStudy=true (active Bible studies)
+  final personDao = await ref.read(personDaoProvider.future);
+  final bibleStudiesCount = await personDao.getBibleStudiesCount();
 
   // Calculate progress
   final targetHours = goal != null

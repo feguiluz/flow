@@ -98,11 +98,14 @@ class VisitDao {
     return maps.map(_mapToVisit).toList();
   }
 
-  /// Count Bible studies for a specific month
+  /// Count Bible studies who had visits in a specific month
   /// A Bible study is counted if:
   /// - The person has is_bible_study = true
   /// - AND they had at least one visit that month
   /// Returns the count of unique people who meet this criteria
+  ///
+  /// Note: This method is kept for potential future use (e.g., statistics)
+  /// The main monthly summary uses PersonDao.getBibleStudiesCount() instead
   Future<int> countBibleStudiesInMonth(int year, int month) async {
     final monthStr = month.toString().padLeft(2, '0');
     final pattern = '$year-$monthStr-%';

@@ -17,8 +17,8 @@ class MonthSummary with _$MonthSummary {
     /// Total hours registered in the month
     required double totalHours,
 
-    /// Count of active Bible studies in the month
-    /// (persons with isBibleStudy=true who had at least 1 visit that month)
+    /// Count of active Bible studies
+    /// (all persons marked as isBibleStudy=true, regardless of visits this month)
     required int bibleStudiesCount,
 
     /// Goal for the month (if set)
