@@ -78,7 +78,7 @@ class DateFormatter {
     return '${getMonthName(month)} $year';
   }
 
-  /// Get relative date description
+  /// Get relative date description with day of week
   static String getRelativeDate(DateTime date) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -90,7 +90,15 @@ class DateFormatter {
     } else if (dateOnly == yesterday) {
       return 'Ayer';
     } else {
-      return formatForDisplay(date);
+      // Format: "Lun, 15 de enero"
+      final formatter = DateFormat('EEE, d \'de\' MMMM', 'es_ES');
+      return formatter.format(date);
     }
+  }
+
+  /// Format date with day of week (e.g., "Lunes, 15 de enero de 2026")
+  static String formatWithDayOfWeek(DateTime date) {
+    final formatter = DateFormat('EEEE, d \'de\' MMMM \'de\' yyyy', 'es_ES');
+    return formatter.format(date);
   }
 }

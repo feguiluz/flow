@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 
@@ -10,6 +12,10 @@ import 'core/services/user_profile_service.dart';
 void main() async {
   // Ensure Flutter bindings are initialized
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Spanish locale for date formatting
+  await initializeDateFormatting('es_ES', null);
+  Intl.defaultLocale = 'es_ES';
 
   // Initialize sqflite for web and desktop platforms
   if (kIsWeb) {
