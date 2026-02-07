@@ -19,16 +19,16 @@ class ActivityList extends ConsumerWidget {
         if (activities.isEmpty) {
           return Center(
             child: Padding(
-              padding: const EdgeInsets.all(32),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
                     Icons.event_note_outlined,
-                    size: 64,
+                    size: 48,
                     color: colorScheme.outlineVariant,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   Text(
                     'No hay actividades registradas',
                     style: theme.textTheme.titleMedium?.copyWith(
@@ -36,7 +36,7 @@ class ActivityList extends ConsumerWidget {
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                   Text(
                     'Toca el botón + para registrar tus horas',
                     style: theme.textTheme.bodyMedium?.copyWith(
@@ -72,16 +72,16 @@ class ActivityList extends ConsumerWidget {
       ),
       error: (error, stackTrace) => Center(
         child: Padding(
-          padding: const EdgeInsets.all(32),
+          padding: const EdgeInsets.all(16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 Icons.error_outline,
-                size: 64,
+                size: 48,
                 color: colorScheme.error,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               Text(
                 'Error al cargar actividades',
                 style: theme.textTheme.titleMedium?.copyWith(
@@ -89,15 +89,17 @@ class ActivityList extends ConsumerWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
               Text(
                 error.toString(),
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
                 textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               FilledButton.icon(
                 onPressed: () {
                   ref.invalidate(activityNotifierProvider);
