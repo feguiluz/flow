@@ -354,7 +354,7 @@ class _YearlyHoursByMonthProviderElement
   int get year => (origin as YearlyHoursByMonthProvider).year;
 }
 
-String _$activityNotifierHash() => r'b40ca98f7f1aa727ef3119d55dd3ba468df3e0cc';
+String _$activityNotifierHash() => r'be8d5081e1f962e370eac4d01d437808643cda7e';
 
 /// Provider for managing activity data for the current month
 ///

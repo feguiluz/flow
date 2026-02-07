@@ -22,7 +22,8 @@ Activity _$ActivityFromJson(Map<String, dynamic> json) {
 mixin _$Activity {
   int? get id => throw _privateConstructorUsedError;
   DateTime get date => throw _privateConstructorUsedError;
-  double get hours => throw _privateConstructorUsedError;
+  int get minutes =>
+      throw _privateConstructorUsedError; // Total minutes (e.g., 150 = 2h 30m)
   String? get notes => throw _privateConstructorUsedError;
   DateTime get createdAt => throw _privateConstructorUsedError;
 
@@ -42,11 +43,7 @@ abstract class $ActivityCopyWith<$Res> {
       _$ActivityCopyWithImpl<$Res, Activity>;
   @useResult
   $Res call(
-      {int? id,
-      DateTime date,
-      double hours,
-      String? notes,
-      DateTime createdAt});
+      {int? id, DateTime date, int minutes, String? notes, DateTime createdAt});
 }
 
 /// @nodoc
@@ -66,7 +63,7 @@ class _$ActivityCopyWithImpl<$Res, $Val extends Activity>
   $Res call({
     Object? id = freezed,
     Object? date = null,
-    Object? hours = null,
+    Object? minutes = null,
     Object? notes = freezed,
     Object? createdAt = null,
   }) {
@@ -79,10 +76,10 @@ class _$ActivityCopyWithImpl<$Res, $Val extends Activity>
           ? _value.date
           : date // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      hours: null == hours
-          ? _value.hours
-          : hours // ignore: cast_nullable_to_non_nullable
-              as double,
+      minutes: null == minutes
+          ? _value.minutes
+          : minutes // ignore: cast_nullable_to_non_nullable
+              as int,
       notes: freezed == notes
           ? _value.notes
           : notes // ignore: cast_nullable_to_non_nullable
@@ -104,11 +101,7 @@ abstract class _$$ActivityImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int? id,
-      DateTime date,
-      double hours,
-      String? notes,
-      DateTime createdAt});
+      {int? id, DateTime date, int minutes, String? notes, DateTime createdAt});
 }
 
 /// @nodoc
@@ -126,7 +119,7 @@ class __$$ActivityImplCopyWithImpl<$Res>
   $Res call({
     Object? id = freezed,
     Object? date = null,
-    Object? hours = null,
+    Object? minutes = null,
     Object? notes = freezed,
     Object? createdAt = null,
   }) {
@@ -139,10 +132,10 @@ class __$$ActivityImplCopyWithImpl<$Res>
           ? _value.date
           : date // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      hours: null == hours
-          ? _value.hours
-          : hours // ignore: cast_nullable_to_non_nullable
-              as double,
+      minutes: null == minutes
+          ? _value.minutes
+          : minutes // ignore: cast_nullable_to_non_nullable
+              as int,
       notes: freezed == notes
           ? _value.notes
           : notes // ignore: cast_nullable_to_non_nullable
@@ -161,7 +154,7 @@ class _$ActivityImpl implements _Activity {
   const _$ActivityImpl(
       {required this.id,
       required this.date,
-      required this.hours,
+      required this.minutes,
       this.notes,
       required this.createdAt});
 
@@ -173,7 +166,8 @@ class _$ActivityImpl implements _Activity {
   @override
   final DateTime date;
   @override
-  final double hours;
+  final int minutes;
+// Total minutes (e.g., 150 = 2h 30m)
   @override
   final String? notes;
   @override
@@ -181,7 +175,7 @@ class _$ActivityImpl implements _Activity {
 
   @override
   String toString() {
-    return 'Activity(id: $id, date: $date, hours: $hours, notes: $notes, createdAt: $createdAt)';
+    return 'Activity(id: $id, date: $date, minutes: $minutes, notes: $notes, createdAt: $createdAt)';
   }
 
   @override
@@ -191,7 +185,7 @@ class _$ActivityImpl implements _Activity {
             other is _$ActivityImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.date, date) || other.date == date) &&
-            (identical(other.hours, hours) || other.hours == hours) &&
+            (identical(other.minutes, minutes) || other.minutes == minutes) &&
             (identical(other.notes, notes) || other.notes == notes) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt));
@@ -200,7 +194,7 @@ class _$ActivityImpl implements _Activity {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, id, date, hours, notes, createdAt);
+      Object.hash(runtimeType, id, date, minutes, notes, createdAt);
 
   /// Create a copy of Activity
   /// with the given fields replaced by the non-null parameter values.
@@ -222,7 +216,7 @@ abstract class _Activity implements Activity {
   const factory _Activity(
       {required final int? id,
       required final DateTime date,
-      required final double hours,
+      required final int minutes,
       final String? notes,
       required final DateTime createdAt}) = _$ActivityImpl;
 
@@ -234,7 +228,7 @@ abstract class _Activity implements Activity {
   @override
   DateTime get date;
   @override
-  double get hours;
+  int get minutes; // Total minutes (e.g., 150 = 2h 30m)
   @override
   String? get notes;
   @override

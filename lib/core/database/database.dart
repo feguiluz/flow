@@ -40,8 +40,9 @@ class AppDatabase {
 
     final db = await openDatabase(
       path,
-      version: 1,
+      version: 2, // Incremented for migration to minutes
       onCreate: _createDB,
+      onUpgrade: _upgradeDB,
       onConfigure: _onConfigure,
     );
 
@@ -56,14 +57,50 @@ class AppDatabase {
     await db.execute('PRAGMA foreign_keys = ON');
   }
 
+  /// Upgrade database schema
+  Future<void> _upgradeDB(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      // Migration from version 1 to 2: Change hours (REAL) to minutes (INTEGER)
+      // ignore: avoid_print
+      print('📦 Migrating database from v$oldVersion to v$newVersion');
+
+      // 1. Create new table with minutes
+      await db.execute('''
+        CREATE TABLE activities_new (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          date TEXT NOT NULL,
+          minutes INTEGER NOT NULL,
+          notes TEXT,
+          created_at TEXT NOT NULL
+        )
+      ''');
+
+      // 2. Copy data, converting hours to minutes
+      await db.execute('''
+        INSERT INTO activities_new (id, date, minutes, notes, created_at)
+        SELECT id, date, CAST(hours * 60 AS INTEGER), notes, created_at
+        FROM activities
+      ''');
+
+      // 3. Drop old table
+      await db.execute('DROP TABLE activities');
+
+      // 4. Rename new table
+      await db.execute('ALTER TABLE activities_new RENAME TO activities');
+
+      // ignore: avoid_print
+      print('✅ Migration completed successfully');
+    }
+  }
+
   /// Create database schema
   Future<void> _createDB(Database db, int version) async {
-    // Activities table - stores daily ministry hours
+    // Activities table - stores daily ministry hours (now in minutes)
     await db.execute('''
       CREATE TABLE activities (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         date TEXT NOT NULL,
-        hours REAL NOT NULL,
+        minutes INTEGER NOT NULL,
         notes TEXT,
         created_at TEXT NOT NULL
       )

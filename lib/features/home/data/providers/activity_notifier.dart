@@ -13,9 +13,14 @@ class ActivityNotifier extends _$ActivityNotifier {
 
   @override
   Future<List<Activity>> build() async {
-    _activityDao = ref.watch(activityDaoProvider);
-    final now = DateTime.now();
-    return _loadActivities(now.year, now.month);
+    try {
+      _activityDao = ref.watch(activityDaoProvider);
+      final now = DateTime.now();
+      return await _loadActivities(now.year, now.month);
+    } catch (e) {
+      // Return empty list on initial load error instead of showing error state
+      return [];
+    }
   }
 
   /// Load activities for a specific month
@@ -63,16 +68,16 @@ class ActivityNotifier extends _$ActivityNotifier {
   }
 }
 
-/// Provider for calculating total hours in the current month
+/// Provider for calculating total minutes in the current month
 @riverpod
-Future<double> currentMonthTotalHours(CurrentMonthTotalHoursRef ref) async {
+Future<int> currentMonthTotalMinutes(CurrentMonthTotalMinutesRef ref) async {
   // Watch the activity list to auto-refresh when it changes
   final activities = await ref.watch(activityNotifierProvider.future);
 
   // Calculate total from the activities list
-  return activities.fold<double>(
-    0.0,
-    (sum, activity) => sum + activity.hours,
+  return activities.fold<int>(
+    0,
+    (sum, activity) => sum + activity.minutes,
   );
 }
 
@@ -87,12 +92,12 @@ Future<List<Activity>> activitiesByMonth(
   return activityDao.getByMonth(year, month);
 }
 
-/// Provider for total hours by month in a specific year
+/// Provider for total minutes by month in a specific year
 @riverpod
-Future<Map<int, double>> yearlyHoursByMonth(
-  YearlyHoursByMonthRef ref,
+Future<Map<int, int>> yearlyMinutesByMonth(
+  YearlyMinutesByMonthRef ref,
   int year,
 ) async {
   final activityDao = ref.watch(activityDaoProvider);
-  return activityDao.getHoursByMonthForYear(year);
+  return activityDao.getMinutesByMonthForYear(year);
 }

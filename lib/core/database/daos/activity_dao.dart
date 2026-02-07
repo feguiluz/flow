@@ -17,7 +17,7 @@ class ActivityDao {
       'activities',
       {
         'date': DateFormatter.formatForDb(activity.date),
-        'hours': activity.hours,
+        'minutes': activity.minutes,
         'notes': activity.notes,
         'created_at': DateFormatter.formatForDb(activity.createdAt),
       },
@@ -35,7 +35,7 @@ class ActivityDao {
       'activities',
       {
         'date': DateFormatter.formatForDb(activity.date),
-        'hours': activity.hours,
+        'minutes': activity.minutes,
         'notes': activity.notes,
         'created_at': DateFormatter.formatForDb(activity.createdAt),
       },
@@ -97,28 +97,28 @@ class ActivityDao {
     return maps.map(_mapToActivity).toList();
   }
 
-  /// Get total hours for a specific month
-  Future<double> getTotalHoursByMonth(int year, int month) async {
+  /// Get total minutes for a specific month
+  Future<int> getTotalMinutesByMonth(int year, int month) async {
     final monthStr = month.toString().padLeft(2, '0');
     final pattern = '$year-$monthStr-%';
 
     final result = await db.rawQuery(
-      'SELECT SUM(hours) as total FROM activities WHERE date LIKE ?',
+      'SELECT SUM(minutes) as total FROM activities WHERE date LIKE ?',
       [pattern],
     );
 
     final total = result.first['total'];
-    return (total as num?)?.toDouble() ?? 0.0;
+    return (total as num?)?.toInt() ?? 0;
   }
 
-  /// Get hours by month for an entire year
-  /// Returns a map of {month: hours} (e.g., {1: 45.5, 2: 30.0, 3: 50.0})
-  Future<Map<int, double>> getHoursByMonthForYear(int year) async {
+  /// Get minutes by month for an entire year
+  /// Returns a map of {month: minutes} (e.g., {1: 2730, 2: 1800, 3: 3000})
+  Future<Map<int, int>> getMinutesByMonthForYear(int year) async {
     final result = await db.rawQuery(
       '''
       SELECT 
         CAST(strftime('%m', date) AS INTEGER) as month,
-        SUM(hours) as total
+        SUM(minutes) as total
       FROM activities
       WHERE date LIKE ?
       GROUP BY month
@@ -127,15 +127,15 @@ class ActivityDao {
       ['$year-%'],
     );
 
-    final hoursMap = <int, double>{};
+    final minutesMap = <int, int>{};
 
     for (final row in result) {
       final month = row['month'] as int;
-      final total = (row['total'] as num).toDouble();
-      hoursMap[month] = total;
+      final total = (row['total'] as num).toInt();
+      minutesMap[month] = total;
     }
 
-    return hoursMap;
+    return minutesMap;
   }
 
   /// Get all activities for a date range
@@ -163,7 +163,7 @@ class ActivityDao {
     return Activity(
       id: map['id'] as int,
       date: DateFormatter.parseFromDb(map['date'] as String),
-      hours: (map['hours'] as num).toDouble(),
+      minutes: (map['minutes'] as num).toInt(),
       notes: map['notes'] as String?,
       createdAt: DateFormatter.parseFromDb(map['created_at'] as String),
     );
