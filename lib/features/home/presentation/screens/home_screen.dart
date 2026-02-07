@@ -36,6 +36,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _showRegisterSheet() {
+    // If selected month is current month, use today; otherwise use first day of month
+    final now = DateTime.now();
+    final initialDate = _isCurrentMonth()
+        ? now // Current month: use today
+        : DateTime(_selectedMonth.year, _selectedMonth.month,
+            1); // Past month: use first day
+
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -44,8 +51,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
         child: RegisterActivitySheet(
-          // Pass the first day of the selected month as initial date
-          initialDate: DateTime(_selectedMonth.year, _selectedMonth.month, 1),
+          initialDate: initialDate,
         ),
       ),
     );
