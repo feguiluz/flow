@@ -94,6 +94,14 @@ class AppTheme {
           vertical: 4,
         ),
       ),
+
+      // SnackBar - Show at top with floating behavior
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
     );
   }
 
@@ -177,6 +185,14 @@ class AppTheme {
         contentPadding: EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 4,
+        ),
+      ),
+
+      // SnackBar - Show at top with floating behavior
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
         ),
       ),
     );

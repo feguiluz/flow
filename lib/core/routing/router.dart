@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../features/home/presentation/screens/home_screen.dart';
-import '../../features/people/presentation/screens/people_screen.dart';
-import '../../features/settings/presentation/screens/settings_screen.dart';
-import '../../features/statistics/presentation/screens/statistics_screen.dart';
+import 'package:flow/core/services/user_profile_service.dart';
+import 'package:flow/features/home/presentation/screens/home_screen.dart';
+import 'package:flow/features/onboarding/presentation/screens/onboarding_screen.dart';
+import 'package:flow/features/people/presentation/screens/people_screen.dart';
+import 'package:flow/features/settings/presentation/screens/settings_screen.dart';
+import 'package:flow/features/statistics/presentation/screens/statistics_screen.dart';
 
 /// Scaffold with bottom navigation bar for the main app shell
 class ScaffoldWithNavBar extends StatelessWidget {
@@ -57,7 +59,31 @@ class ScaffoldWithNavBar extends StatelessWidget {
 /// GoRouter configuration for the app
 final router = GoRouter(
   initialLocation: '/home',
+  redirect: (context, state) {
+    final userProfile = UserProfileService.instance;
+    final needsOnboarding = userProfile.needsOnboarding();
+    final isOnboardingRoute = state.matchedLocation == '/onboarding';
+
+    // If needs onboarding and not already there, redirect to onboarding
+    if (needsOnboarding && !isOnboardingRoute) {
+      return '/onboarding';
+    }
+
+    // If doesn't need onboarding and on onboarding route, redirect to home
+    if (!needsOnboarding && isOnboardingRoute) {
+      return '/home';
+    }
+
+    // No redirect needed
+    return null;
+  },
   routes: [
+    // Onboarding route (outside StatefulShellRoute)
+    GoRoute(
+      path: '/onboarding',
+      builder: (context, state) => const OnboardingScreen(),
+    ),
+
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
         return ScaffoldWithNavBar(navigationShell: navigationShell);

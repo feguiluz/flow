@@ -1,8 +1,10 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../core/services/user_profile_service.dart';
-import '../../../../shared/models/month_summary.dart';
-import '../../../../shared/providers/database_provider.dart';
+import 'package:flow/core/services/user_profile_service.dart';
+import 'package:flow/shared/models/month_summary.dart';
+import 'package:flow/shared/models/publisher_type.dart';
+import 'package:flow/shared/providers/database_provider.dart';
+import 'package:flow/shared/providers/user_profile_provider.dart';
 import 'goal_notifier.dart';
 
 part 'month_summary_provider.g.dart';
@@ -14,7 +16,16 @@ Future<MonthSummary> monthSummary(
   int year,
   int month,
 ) async {
-  // Get goal for the month
+  // Watch user profile to automatically invalidate when it changes
+  final userProfile = await ref.watch(userProfileProvider.future);
+
+  // Listen to profile changes and invalidate this provider
+  ref.listen(userProfileProvider, (previous, next) {
+    // Force rebuild when profile changes
+    ref.invalidateSelf();
+  });
+
+  // Get goal for the month (may be null for regular/special pioneers)
   final goal = await ref.watch(goalNotifierProvider(year, month).future);
 
   // Get total hours for the month
@@ -30,10 +41,40 @@ Future<MonthSummary> monthSummary(
   final personDao = await ref.read(personDaoProvider.future);
   final bibleStudiesCount = await personDao.getBibleStudiesCount();
 
-  // Calculate progress
-  final targetHours = goal != null
-      ? UserProfileService.instance.getTargetHoursForGoal(goal.goalType)
-      : 0.0;
+  // Calculate target hours based on publisher type and start date
+  double targetHours = 0.0;
+  final currentMonthDate = DateTime(year, month, 1);
+
+  if (userProfile.publisherType == PublisherType.regularPioneer) {
+    // Regular pioneer: automatic 50h goal ONLY if month >= start date
+    final startDate = userProfile.regularPioneerStartDate;
+    if (startDate != null) {
+      final startMonthDate = DateTime(startDate.year, startDate.month, 1);
+      // Check if current month is on or after start month
+      if (currentMonthDate.isAtSameMomentAs(startMonthDate) ||
+          currentMonthDate.isAfter(startMonthDate)) {
+        targetHours = 50.0;
+      }
+    }
+  } else if (userProfile.publisherType == PublisherType.specialPioneer) {
+    // Special pioneer: automatic 90-100h goal based on gender/age ONLY if month >= start date
+    final startDate = userProfile.specialPioneerStartDate;
+    if (startDate != null) {
+      final startMonthDate = DateTime(startDate.year, startDate.month, 1);
+      // Check if current month is on or after start month
+      if (currentMonthDate.isAtSameMomentAs(startMonthDate) ||
+          currentMonthDate.isAfter(startMonthDate)) {
+        targetHours =
+            UserProfileService.instance.getMonthlyGoalHours() ?? 100.0;
+      }
+    }
+  } else if (userProfile.publisherType == PublisherType.publisher) {
+    // Publisher: only has goal if they set auxiliary pioneer goal manually
+    if (goal != null) {
+      targetHours =
+          UserProfileService.instance.getTargetHoursForGoal(goal.goalType);
+    }
+  }
 
   final progressPercentage = targetHours > 0
       ? (totalHours / targetHours * 100.0).clamp(0.0, double.infinity)
@@ -49,6 +90,7 @@ Future<MonthSummary> monthSummary(
     goal: goal,
     progressPercentage: progressPercentage,
     isGoalMet: isGoalMet,
+    targetHours: targetHours, // Add explicit target hours
   );
 }
 

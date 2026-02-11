@@ -1,12 +1,13 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'month_summary_provider.dart';
+part of 'export_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$monthSummaryHash() => r'824bfc8a8685259b3e1b1370813187e214dfa459';
+String _$generateTextReportHash() =>
+    r'50746c6f50790b0874f60d7fefc9b323ab7bc1e8';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,37 +30,37 @@ class _SystemHash {
   }
 }
 
-/// Provider for calculating month summary for a specific month
+/// Generate text report for a specific month
 ///
-/// Copied from [monthSummary].
-@ProviderFor(monthSummary)
-const monthSummaryProvider = MonthSummaryFamily();
+/// Copied from [generateTextReport].
+@ProviderFor(generateTextReport)
+const generateTextReportProvider = GenerateTextReportFamily();
 
-/// Provider for calculating month summary for a specific month
+/// Generate text report for a specific month
 ///
-/// Copied from [monthSummary].
-class MonthSummaryFamily extends Family<AsyncValue<MonthSummary>> {
-  /// Provider for calculating month summary for a specific month
+/// Copied from [generateTextReport].
+class GenerateTextReportFamily extends Family<AsyncValue<String>> {
+  /// Generate text report for a specific month
   ///
-  /// Copied from [monthSummary].
-  const MonthSummaryFamily();
+  /// Copied from [generateTextReport].
+  const GenerateTextReportFamily();
 
-  /// Provider for calculating month summary for a specific month
+  /// Generate text report for a specific month
   ///
-  /// Copied from [monthSummary].
-  MonthSummaryProvider call(
+  /// Copied from [generateTextReport].
+  GenerateTextReportProvider call(
     int year,
     int month,
   ) {
-    return MonthSummaryProvider(
+    return GenerateTextReportProvider(
       year,
       month,
     );
   }
 
   @override
-  MonthSummaryProvider getProviderOverride(
-    covariant MonthSummaryProvider provider,
+  GenerateTextReportProvider getProviderOverride(
+    covariant GenerateTextReportProvider provider,
   ) {
     return call(
       provider.year,
@@ -79,39 +80,39 @@ class MonthSummaryFamily extends Family<AsyncValue<MonthSummary>> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'monthSummaryProvider';
+  String? get name => r'generateTextReportProvider';
 }
 
-/// Provider for calculating month summary for a specific month
+/// Generate text report for a specific month
 ///
-/// Copied from [monthSummary].
-class MonthSummaryProvider extends AutoDisposeFutureProvider<MonthSummary> {
-  /// Provider for calculating month summary for a specific month
+/// Copied from [generateTextReport].
+class GenerateTextReportProvider extends AutoDisposeFutureProvider<String> {
+  /// Generate text report for a specific month
   ///
-  /// Copied from [monthSummary].
-  MonthSummaryProvider(
+  /// Copied from [generateTextReport].
+  GenerateTextReportProvider(
     int year,
     int month,
   ) : this._internal(
-          (ref) => monthSummary(
-            ref as MonthSummaryRef,
+          (ref) => generateTextReport(
+            ref as GenerateTextReportRef,
             year,
             month,
           ),
-          from: monthSummaryProvider,
-          name: r'monthSummaryProvider',
+          from: generateTextReportProvider,
+          name: r'generateTextReportProvider',
           debugGetCreateSourceHash:
               const bool.fromEnvironment('dart.vm.product')
                   ? null
-                  : _$monthSummaryHash,
-          dependencies: MonthSummaryFamily._dependencies,
+                  : _$generateTextReportHash,
+          dependencies: GenerateTextReportFamily._dependencies,
           allTransitiveDependencies:
-              MonthSummaryFamily._allTransitiveDependencies,
+              GenerateTextReportFamily._allTransitiveDependencies,
           year: year,
           month: month,
         );
 
-  MonthSummaryProvider._internal(
+  GenerateTextReportProvider._internal(
     super._createNotifier, {
     required super.name,
     required super.dependencies,
@@ -127,12 +128,12 @@ class MonthSummaryProvider extends AutoDisposeFutureProvider<MonthSummary> {
 
   @override
   Override overrideWith(
-    FutureOr<MonthSummary> Function(MonthSummaryRef provider) create,
+    FutureOr<String> Function(GenerateTextReportRef provider) create,
   ) {
     return ProviderOverride(
       origin: this,
-      override: MonthSummaryProvider._internal(
-        (ref) => create(ref as MonthSummaryRef),
+      override: GenerateTextReportProvider._internal(
+        (ref) => create(ref as GenerateTextReportRef),
         from: from,
         name: null,
         dependencies: null,
@@ -145,13 +146,13 @@ class MonthSummaryProvider extends AutoDisposeFutureProvider<MonthSummary> {
   }
 
   @override
-  AutoDisposeFutureProviderElement<MonthSummary> createElement() {
-    return _MonthSummaryProviderElement(this);
+  AutoDisposeFutureProviderElement<String> createElement() {
+    return _GenerateTextReportProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is MonthSummaryProvider &&
+    return other is GenerateTextReportProvider &&
         other.year == year &&
         other.month == month;
   }
@@ -168,7 +169,7 @@ class MonthSummaryProvider extends AutoDisposeFutureProvider<MonthSummary> {
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin MonthSummaryRef on AutoDisposeFutureProviderRef<MonthSummary> {
+mixin GenerateTextReportRef on AutoDisposeFutureProviderRef<String> {
   /// The parameter `year` of this provider.
   int get year;
 
@@ -176,37 +177,15 @@ mixin MonthSummaryRef on AutoDisposeFutureProviderRef<MonthSummary> {
   int get month;
 }
 
-class _MonthSummaryProviderElement
-    extends AutoDisposeFutureProviderElement<MonthSummary>
-    with MonthSummaryRef {
-  _MonthSummaryProviderElement(super.provider);
+class _GenerateTextReportProviderElement
+    extends AutoDisposeFutureProviderElement<String>
+    with GenerateTextReportRef {
+  _GenerateTextReportProviderElement(super.provider);
 
   @override
-  int get year => (origin as MonthSummaryProvider).year;
+  int get year => (origin as GenerateTextReportProvider).year;
   @override
-  int get month => (origin as MonthSummaryProvider).month;
+  int get month => (origin as GenerateTextReportProvider).month;
 }
-
-String _$currentMonthSummaryHash() =>
-    r'337973ade11039b09d327d7fc501de3d7f987517';
-
-/// Provider for current month summary
-///
-/// Copied from [currentMonthSummary].
-@ProviderFor(currentMonthSummary)
-final currentMonthSummaryProvider =
-    AutoDisposeFutureProvider<MonthSummary>.internal(
-  currentMonthSummary,
-  name: r'currentMonthSummaryProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$currentMonthSummaryHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef CurrentMonthSummaryRef = AutoDisposeFutureProviderRef<MonthSummary>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

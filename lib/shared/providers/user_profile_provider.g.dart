@@ -27,7 +27,7 @@ final userProfileServiceProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef UserProfileServiceRef = AutoDisposeProviderRef<UserProfileService>;
-String _$userProfileHash() => r'd0c31c80eb97215aa1f648898f10a963474bac45';
+String _$userProfileHash() => r'd7c62fca939cfb58c39c3bfacd3919affe3838d8';
 
 /// Provider for user profile data
 ///

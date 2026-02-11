@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:flow/shared/models/publisher_type.dart';
+import 'package:flow/shared/providers/user_profile_provider.dart';
+import 'package:flow/features/home/data/providers/goal_notifier.dart';
 import '../widgets/activity_list.dart';
 import '../widgets/month_summary_card.dart';
 import '../widgets/register_activity_sheet.dart';
@@ -84,10 +87,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    // Check if user can register hours
+    final profileAsync = ref.watch(userProfileProvider);
+    final profile = profileAsync.valueOrNull;
+
+    // Check if publisher has auxiliary goal
+    bool canRegisterHours = true;
+    if (profile?.publisherType == PublisherType.publisher) {
+      final goalAsync = ref.watch(
+        goalNotifierProvider(_selectedMonth.year, _selectedMonth.month),
+      );
+      final hasGoal = goalAsync.valueOrNull != null;
+      canRegisterHours = hasGoal;
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Flow'),
-        centerTitle: false,
+        centerTitle: true,
       ),
       body: Column(
         children: [
@@ -103,57 +120,90 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
 
-          // Divider
-          const Divider(height: 1),
-          const SizedBox(height: 8),
+          // Only show activities section if user can register hours
+          if (canRegisterHours) ...[
+            // Divider
+            const Divider(height: 1),
+            const SizedBox(height: 8),
 
-          // Activity list section header
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                Text(
-                  'Actividades del mes',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
+            // Activity list section header
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  Text(
+                    'Actividades del mes',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8),
-
-          // Activity list with animation
-          Expanded(
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              transitionBuilder: (child, animation) {
-                return FadeTransition(
-                  opacity: animation,
-                  child: SlideTransition(
-                    position: Tween<Offset>(
-                      begin: const Offset(0.1, 0),
-                      end: Offset.zero,
-                    ).animate(animation),
-                    child: child,
-                  ),
-                );
-              },
-              child: ActivityList(
-                key: ValueKey('${_selectedMonth.year}-${_selectedMonth.month}'),
-                year: _selectedMonth.year,
-                month: _selectedMonth.month,
+                ],
               ),
             ),
-          ),
+            const SizedBox(height: 8),
+
+            // Activity list with animation
+            Expanded(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                transitionBuilder: (child, animation) {
+                  return FadeTransition(
+                    opacity: animation,
+                    child: SlideTransition(
+                      position: Tween<Offset>(
+                        begin: const Offset(0.1, 0),
+                        end: Offset.zero,
+                      ).animate(animation),
+                      child: child,
+                    ),
+                  );
+                },
+                child: ActivityList(
+                  key: ValueKey(
+                      '${_selectedMonth.year}-${_selectedMonth.month}'),
+                  year: _selectedMonth.year,
+                  month: _selectedMonth.month,
+                ),
+              ),
+            ),
+          ] else ...[
+            // Show info message for publishers without goal
+            Expanded(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        size: 64,
+                        color: theme.colorScheme.primary.withOpacity(0.5),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Establece una meta auxiliar para registrar horas',
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _showRegisterSheet,
-        icon: const Icon(Icons.add),
-        label: const Text('Registrar'),
-        tooltip: 'Registrar horas',
-      ),
+      floatingActionButton: canRegisterHours
+          ? FloatingActionButton.extended(
+              onPressed: _showRegisterSheet,
+              icon: const Icon(Icons.add),
+              label: const Text('Registrar'),
+              tooltip: 'Registrar horas',
+            )
+          : null,
     );
   }
 

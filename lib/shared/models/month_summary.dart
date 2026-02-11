@@ -21,8 +21,13 @@ class MonthSummary with _$MonthSummary {
     /// (all persons marked as isBibleStudy=true, regardless of visits this month)
     required int bibleStudiesCount,
 
-    /// Goal for the month (if set)
+    /// Goal for the month (if set manually - for auxiliary pioneers)
     Goal? goal,
+
+    /// Target hours for the month
+    /// For regular/special pioneers: automatic based on privilege
+    /// For publishers: from goal if set, otherwise 0
+    @Default(0.0) double targetHours,
 
     /// Progress percentage (0.0 to 100.0+)
     /// Calculated as (totalHours / targetHours) * 100
@@ -36,14 +41,10 @@ class MonthSummary with _$MonthSummary {
 
   const MonthSummary._();
 
-  /// Get target hours from goal
-  /// Returns 0.0 if no goal set
-  double get targetHours => goal?.targetHours ?? 0.0;
-
   /// Get remaining hours to meet goal
-  /// Returns 0.0 if goal is met or no goal set
+  /// Returns 0.0 if goal is met or no target hours set
   double get remainingHours {
-    if (goal == null || isGoalMet) return 0.0;
+    if (targetHours == 0.0 || isGoalMet) return 0.0;
     return (targetHours - totalHours).clamp(0.0, double.infinity);
   }
 
@@ -52,7 +53,7 @@ class MonthSummary with _$MonthSummary {
   /// - Yellow (50-89%): In progress
   /// - Red (<50%): Below target
   ProgressColor get progressColor {
-    if (goal == null) return ProgressColor.gray;
+    if (targetHours == 0.0) return ProgressColor.gray;
     if (progressPercentage >= 90) return ProgressColor.green;
     if (progressPercentage >= 50) return ProgressColor.yellow;
     return ProgressColor.red;
@@ -60,7 +61,7 @@ class MonthSummary with _$MonthSummary {
 
   /// Get status message
   String get statusMessage {
-    if (goal == null) return 'Sin meta establecida';
+    if (targetHours == 0.0) return 'Sin meta establecida';
     if (isGoalMet) return '¡Meta cumplida!';
     if (remainingHours == 0.0) return '¡Meta cumplida!';
     return 'Faltan ${remainingHours.toStringAsFixed(1)} horas';

@@ -25,12 +25,17 @@ mixin _$MonthSummary {
   /// Total hours registered in the month
   double get totalHours => throw _privateConstructorUsedError;
 
-  /// Count of active Bible studies in the month
-  /// (persons with isBibleStudy=true who had at least 1 visit that month)
+  /// Count of active Bible studies
+  /// (all persons marked as isBibleStudy=true, regardless of visits this month)
   int get bibleStudiesCount => throw _privateConstructorUsedError;
 
-  /// Goal for the month (if set)
+  /// Goal for the month (if set manually - for auxiliary pioneers)
   Goal? get goal => throw _privateConstructorUsedError;
+
+  /// Target hours for the month
+  /// For regular/special pioneers: automatic based on privilege
+  /// For publishers: from goal if set, otherwise 0
+  double get targetHours => throw _privateConstructorUsedError;
 
   /// Progress percentage (0.0 to 100.0+)
   /// Calculated as (totalHours / targetHours) * 100
@@ -60,6 +65,7 @@ abstract class $MonthSummaryCopyWith<$Res> {
       double totalHours,
       int bibleStudiesCount,
       Goal? goal,
+      double targetHours,
       double progressPercentage,
       bool isGoalMet});
 
@@ -86,6 +92,7 @@ class _$MonthSummaryCopyWithImpl<$Res, $Val extends MonthSummary>
     Object? totalHours = null,
     Object? bibleStudiesCount = null,
     Object? goal = freezed,
+    Object? targetHours = null,
     Object? progressPercentage = null,
     Object? isGoalMet = null,
   }) {
@@ -110,6 +117,10 @@ class _$MonthSummaryCopyWithImpl<$Res, $Val extends MonthSummary>
           ? _value.goal
           : goal // ignore: cast_nullable_to_non_nullable
               as Goal?,
+      targetHours: null == targetHours
+          ? _value.targetHours
+          : targetHours // ignore: cast_nullable_to_non_nullable
+              as double,
       progressPercentage: null == progressPercentage
           ? _value.progressPercentage
           : progressPercentage // ignore: cast_nullable_to_non_nullable
@@ -150,6 +161,7 @@ abstract class _$$MonthSummaryImplCopyWith<$Res>
       double totalHours,
       int bibleStudiesCount,
       Goal? goal,
+      double targetHours,
       double progressPercentage,
       bool isGoalMet});
 
@@ -175,6 +187,7 @@ class __$$MonthSummaryImplCopyWithImpl<$Res>
     Object? totalHours = null,
     Object? bibleStudiesCount = null,
     Object? goal = freezed,
+    Object? targetHours = null,
     Object? progressPercentage = null,
     Object? isGoalMet = null,
   }) {
@@ -199,6 +212,10 @@ class __$$MonthSummaryImplCopyWithImpl<$Res>
           ? _value.goal
           : goal // ignore: cast_nullable_to_non_nullable
               as Goal?,
+      targetHours: null == targetHours
+          ? _value.targetHours
+          : targetHours // ignore: cast_nullable_to_non_nullable
+              as double,
       progressPercentage: null == progressPercentage
           ? _value.progressPercentage
           : progressPercentage // ignore: cast_nullable_to_non_nullable
@@ -220,6 +237,7 @@ class _$MonthSummaryImpl extends _MonthSummary {
       required this.totalHours,
       required this.bibleStudiesCount,
       this.goal,
+      this.targetHours = 0.0,
       required this.progressPercentage,
       required this.isGoalMet})
       : super._();
@@ -236,14 +254,21 @@ class _$MonthSummaryImpl extends _MonthSummary {
   @override
   final double totalHours;
 
-  /// Count of active Bible studies in the month
-  /// (persons with isBibleStudy=true who had at least 1 visit that month)
+  /// Count of active Bible studies
+  /// (all persons marked as isBibleStudy=true, regardless of visits this month)
   @override
   final int bibleStudiesCount;
 
-  /// Goal for the month (if set)
+  /// Goal for the month (if set manually - for auxiliary pioneers)
   @override
   final Goal? goal;
+
+  /// Target hours for the month
+  /// For regular/special pioneers: automatic based on privilege
+  /// For publishers: from goal if set, otherwise 0
+  @override
+  @JsonKey()
+  final double targetHours;
 
   /// Progress percentage (0.0 to 100.0+)
   /// Calculated as (totalHours / targetHours) * 100
@@ -258,7 +283,7 @@ class _$MonthSummaryImpl extends _MonthSummary {
 
   @override
   String toString() {
-    return 'MonthSummary(year: $year, month: $month, totalHours: $totalHours, bibleStudiesCount: $bibleStudiesCount, goal: $goal, progressPercentage: $progressPercentage, isGoalMet: $isGoalMet)';
+    return 'MonthSummary(year: $year, month: $month, totalHours: $totalHours, bibleStudiesCount: $bibleStudiesCount, goal: $goal, targetHours: $targetHours, progressPercentage: $progressPercentage, isGoalMet: $isGoalMet)';
   }
 
   @override
@@ -273,6 +298,8 @@ class _$MonthSummaryImpl extends _MonthSummary {
             (identical(other.bibleStudiesCount, bibleStudiesCount) ||
                 other.bibleStudiesCount == bibleStudiesCount) &&
             (identical(other.goal, goal) || other.goal == goal) &&
+            (identical(other.targetHours, targetHours) ||
+                other.targetHours == targetHours) &&
             (identical(other.progressPercentage, progressPercentage) ||
                 other.progressPercentage == progressPercentage) &&
             (identical(other.isGoalMet, isGoalMet) ||
@@ -281,7 +308,7 @@ class _$MonthSummaryImpl extends _MonthSummary {
 
   @override
   int get hashCode => Object.hash(runtimeType, year, month, totalHours,
-      bibleStudiesCount, goal, progressPercentage, isGoalMet);
+      bibleStudiesCount, goal, targetHours, progressPercentage, isGoalMet);
 
   /// Create a copy of MonthSummary
   /// with the given fields replaced by the non-null parameter values.
@@ -299,6 +326,7 @@ abstract class _MonthSummary extends MonthSummary {
       required final double totalHours,
       required final int bibleStudiesCount,
       final Goal? goal,
+      final double targetHours,
       required final double progressPercentage,
       required final bool isGoalMet}) = _$MonthSummaryImpl;
   const _MonthSummary._() : super._();
@@ -315,14 +343,20 @@ abstract class _MonthSummary extends MonthSummary {
   @override
   double get totalHours;
 
-  /// Count of active Bible studies in the month
-  /// (persons with isBibleStudy=true who had at least 1 visit that month)
+  /// Count of active Bible studies
+  /// (all persons marked as isBibleStudy=true, regardless of visits this month)
   @override
   int get bibleStudiesCount;
 
-  /// Goal for the month (if set)
+  /// Goal for the month (if set manually - for auxiliary pioneers)
   @override
   Goal? get goal;
+
+  /// Target hours for the month
+  /// For regular/special pioneers: automatic based on privilege
+  /// For publishers: from goal if set, otherwise 0
+  @override
+  double get targetHours;
 
   /// Progress percentage (0.0 to 100.0+)
   /// Calculated as (totalHours / targetHours) * 100

@@ -3,6 +3,7 @@ import 'package:sqflite/sqflite.dart';
 
 import '../../core/database/daos/activity_dao.dart';
 import '../../core/database/daos/goal_dao.dart';
+import '../../core/database/daos/participation_dao.dart';
 import '../../core/database/daos/person_dao.dart';
 import '../../core/database/daos/visit_dao.dart';
 import '../../core/database/database.dart';
@@ -41,4 +42,11 @@ Future<VisitDao> visitDao(VisitDaoRef ref) async {
 Future<GoalDao> goalDao(GoalDaoRef ref) async {
   final db = await ref.watch(databaseProvider.future);
   return GoalDao(db);
+}
+
+/// Provider for ParticipationDao
+@riverpod
+Future<ParticipationDao> participationDao(ParticipationDaoRef ref) async {
+  final db = await ref.watch(databaseProvider.future);
+  return ParticipationDao(db);
 }

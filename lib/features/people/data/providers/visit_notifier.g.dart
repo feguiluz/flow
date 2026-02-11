@@ -793,7 +793,7 @@ class _VisitByIdProviderElement extends AutoDisposeFutureProviderElement<Visit?>
   int get id => (origin as VisitByIdProvider).id;
 }
 
-String _$visitNotifierHash() => r'43b19bd3afa3f1e5b948ecbc674a820264cbfcd9';
+String _$visitNotifierHash() => r'de400c561e5fbeb4b3d2e3334a9538bc8cc88a8c';
 
 abstract class _$VisitNotifier
     extends BuildlessAutoDisposeAsyncNotifier<List<Visit>> {

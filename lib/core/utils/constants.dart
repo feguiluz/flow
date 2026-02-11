@@ -15,7 +15,9 @@ class AppConstants {
   static const double missionaryFemaleUnder40Hours = 100.0;
   static const double missionaryFemaleOver40Hours = 90.0;
 
-  // Special months (March and April always have 15h option available)
+  // Special months (March and April - historically had special campaigns)
+  // Note: As of recent years, 15h auxiliary pioneer is available ALL year round
+  @Deprecated('15h option is now available all year, not just special months')
   static const List<int> specialMonths = [3, 4]; // March, April
 
   // Date formats
@@ -25,10 +27,20 @@ class AppConstants {
 
   // SharedPreferences keys
   static const String keyUserName = 'user_name';
-  static const String keyDefaultGoalType = 'default_goal_type';
-  static const String keyUserGender = 'user_gender';
-  static const String keyUserAge = 'user_age';
+  static const String keyPublisherType = 'user_publisher_type';
+  static const String keyGender = 'user_gender';
+  static const String keyBirthDate = 'user_birth_date';
+  static const String keyRegularPioneerStartDate = 'regular_pioneer_start_date';
+  static const String keySpecialPioneerStartDate = 'special_pioneer_start_date';
   static const String keyThemeMode = 'theme_mode';
+
+  // Deprecated keys (kept for migration, will be removed in future)
+  @Deprecated('Use keyPublisherType instead')
+  static const String keyDefaultGoalType = 'default_goal_type';
+  @Deprecated('Use keyGender instead')
+  static const String keyUserGender = 'user_gender';
+  @Deprecated('Use keyBirthDate instead')
+  static const String keyUserAge = 'user_age';
 
   // Gender values
   static const String genderMale = 'male';

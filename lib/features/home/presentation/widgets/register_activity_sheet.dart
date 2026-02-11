@@ -2,14 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/utils/constants.dart';
-import '../../../../core/utils/date_formatter.dart';
-import '../../../../core/utils/time_formatter.dart';
-import '../../../../core/utils/validators.dart';
-import '../../../../shared/models/activity.dart';
-import '../../../../shared/providers/database_provider.dart';
-import '../../../../shared/widgets/app_banner.dart';
-import '../../data/providers/activity_notifier.dart';
+import 'package:flow/core/utils/constants.dart';
+import 'package:flow/core/utils/date_formatter.dart';
+import 'package:flow/core/utils/time_formatter.dart';
+import 'package:flow/shared/models/activity.dart';
+import 'package:flow/shared/models/publisher_type.dart';
+import 'package:flow/shared/providers/database_provider.dart';
+import 'package:flow/shared/providers/user_profile_provider.dart';
+import 'package:flow/shared/widgets/app_banner.dart';
+import 'package:flow/features/home/data/providers/activity_notifier.dart';
+import 'package:flow/features/home/data/providers/goal_notifier.dart';
 
 /// Bottom sheet for registering or editing activity hours
 class RegisterActivitySheet extends ConsumerStatefulWidget {
@@ -192,6 +194,57 @@ class _RegisterActivitySheetState extends ConsumerState<RegisterActivitySheet> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+
+    // Check if user can register hours
+    final profileAsync = ref.watch(userProfileProvider);
+    final profile = profileAsync.valueOrNull;
+
+    // Publishers need auxiliary goal to register hours
+    if (profile?.publisherType == PublisherType.publisher &&
+        widget.activity == null) {
+      // Check if there's a goal for the selected month
+      final goalAsync = ref.watch(
+        goalNotifierProvider(_selectedDate.year, _selectedDate.month),
+      );
+
+      final hasGoal = goalAsync.valueOrNull != null;
+
+      if (!hasGoal) {
+        // Publisher without auxiliary goal cannot register hours
+        return Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.info_outline,
+                size: 64,
+                color: colorScheme.primary,
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'No puedes registrar horas',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Como publicador, necesitas establecer una meta de precursor auxiliar para poder registrar horas.\n\nVe a la tarjeta del mes y toca "Establecer meta auxiliar".',
+                style: theme.textTheme.bodyLarge,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              FilledButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Entendido'),
+              ),
+            ],
+          ),
+        );
+      }
+    }
 
     return Padding(
       padding: EdgeInsets.only(

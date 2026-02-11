@@ -246,7 +246,7 @@ class _PersonByIdProviderElement
   int get id => (origin as PersonByIdProvider).id;
 }
 
-String _$personNotifierHash() => r'954e0b52a696e410159e858ccec0973f83190cd2';
+String _$personNotifierHash() => r'7513530be09acb9b313ace4d5e53e34a5e442ddb';
 
 /// Provider for managing person data (Bible studies and interested persons)
 ///

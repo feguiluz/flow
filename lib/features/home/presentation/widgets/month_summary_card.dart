@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import '../../../../core/utils/constants.dart';
-import '../../../../shared/models/month_summary.dart';
-import '../../data/providers/month_summary_provider.dart';
-import 'goal_selector_dialog.dart';
+import 'package:flow/shared/models/month_summary.dart';
+import 'package:flow/shared/models/publisher_type.dart';
+import 'package:flow/shared/providers/user_profile_provider.dart';
+import 'package:flow/features/home/data/providers/month_summary_provider.dart';
+import 'auxiliary_goal_dialog.dart';
+import 'participation_checkbox.dart';
 
 /// Card displaying monthly summary with goal progress
 class MonthSummaryCard extends ConsumerWidget {
@@ -56,6 +58,11 @@ class MonthSummaryCard extends ConsumerWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
+    // Get user profile to check if can edit goal
+    final profileAsync = ref.watch(userProfileProvider);
+    final profile = profileAsync.valueOrNull;
+    final isPublisher = profile?.publisherType == PublisherType.publisher;
+
     // Month name
     final monthName = DateFormat.MMMM('es').format(
       DateTime(summary.year, summary.month),
@@ -70,7 +77,7 @@ class MonthSummaryCard extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header: Month + Edit button
+            // Header: Month + Edit button (only for publishers)
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -80,26 +87,31 @@ class MonthSummaryCard extends ConsumerWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.edit_outlined),
-                  tooltip: 'Editar meta',
-                  onPressed: () => _showGoalSelector(context, ref, summary),
-                ),
+                if (isPublisher)
+                  IconButton(
+                    icon: const Icon(Icons.edit_outlined),
+                    tooltip: 'Editar meta auxiliar',
+                    onPressed: () => _showGoalSelector(context, ref, summary),
+                  ),
               ],
             ),
             const SizedBox(height: 16),
 
-            // Goal info or "Set goal" button
-            if (summary.goal != null)
-              _buildGoalInfo(theme, colorScheme, summary)
-            else
-              _buildSetGoalButton(context, ref, summary, colorScheme),
-
-            const SizedBox(height: 16),
-
-            // Progress bar (only if goal exists)
-            if (summary.goal != null) ...[
+            // Show different content based on user type and goal status
+            if (summary.targetHours > 0) ...[
+              // Has target hours: Show goal info and progress
+              _buildGoalInfo(theme, colorScheme, summary),
+              const SizedBox(height: 16),
               _buildProgressBar(colorScheme, summary),
+              const SizedBox(height: 16),
+            ] else if (isPublisher) ...[
+              // Publisher without auxiliary goal: Show participation checkbox
+              ParticipationCheckbox(
+                year: summary.year,
+                month: summary.month,
+              ),
+              const SizedBox(height: 8),
+              _buildSetGoalButton(context, ref, summary, colorScheme),
               const SizedBox(height: 16),
             ],
 
@@ -116,7 +128,10 @@ class MonthSummaryCard extends ConsumerWidget {
     ColorScheme colorScheme,
     MonthSummary summary,
   ) {
-    final goalTypeLabel = _getGoalTypeLabel(summary.goal!.goalType);
+    // Get label from goal if it exists, otherwise show "Meta automática"
+    final goalTypeLabel = summary.goal != null
+        ? _getGoalTypeLabel(summary.goal!.goalType)
+        : 'Meta automática';
 
     return Row(
       children: [
@@ -267,10 +282,33 @@ class MonthSummaryCard extends ConsumerWidget {
     WidgetRef ref,
     MonthSummary summary,
   ) async {
-    await showModalBottomSheet(
+    // Only publishers can set auxiliary goals
+    final profileAsync = ref.read(userProfileProvider);
+    final profile = profileAsync.valueOrNull;
+
+    if (profile?.publisherType != PublisherType.publisher) {
+      // Show info dialog for pioneers
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Meta automática'),
+          content: const Text(
+            'Como precursor regular o especial, tu meta es automática según tu privilegio y no puede ser modificada.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Entendido'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    await showDialog(
       context: context,
-      isScrollControlled: true,
-      builder: (context) => GoalSelectorDialog(
+      builder: (context) => AuxiliaryGoalDialog(
         currentGoal: summary.goal,
         year: summary.year,
         month: summary.month,

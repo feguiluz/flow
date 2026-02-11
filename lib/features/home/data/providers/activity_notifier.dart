@@ -1,8 +1,9 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../core/database/daos/activity_dao.dart';
-import '../../../../shared/models/activity.dart';
-import '../../../../shared/providers/database_provider.dart';
+import 'package:flow/core/database/daos/activity_dao.dart';
+import 'package:flow/features/home/data/providers/month_summary_provider.dart';
+import 'package:flow/shared/models/activity.dart';
+import 'package:flow/shared/providers/database_provider.dart';
 
 part 'activity_notifier.g.dart';
 
@@ -33,6 +34,7 @@ class ActivityNotifier extends _$ActivityNotifier {
       ref.invalidate(getTotalMinutesForMonthProvider);
       ref.invalidate(serviceYearTotalMinutesProvider);
       ref.invalidate(serviceYearTotalUpToProvider);
+      ref.invalidate(monthSummaryProvider);
 
       final now = DateTime.now();
       return activityDao.getByMonth(now.year, now.month);
@@ -51,6 +53,7 @@ class ActivityNotifier extends _$ActivityNotifier {
       ref.invalidate(getTotalMinutesForMonthProvider);
       ref.invalidate(serviceYearTotalMinutesProvider);
       ref.invalidate(serviceYearTotalUpToProvider);
+      ref.invalidate(monthSummaryProvider);
 
       final now = DateTime.now();
       return activityDao.getByMonth(now.year, now.month);
@@ -69,6 +72,7 @@ class ActivityNotifier extends _$ActivityNotifier {
       ref.invalidate(getTotalMinutesForMonthProvider);
       ref.invalidate(serviceYearTotalMinutesProvider);
       ref.invalidate(serviceYearTotalUpToProvider);
+      ref.invalidate(monthSummaryProvider);
 
       final now = DateTime.now();
       return activityDao.getByMonth(now.year, now.month);

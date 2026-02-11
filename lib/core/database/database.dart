@@ -40,7 +40,7 @@ class AppDatabase {
 
     final db = await openDatabase(
       path,
-      version: 4, // Incremented to add location fields
+      version: 5, // Incremented to add participations table
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
       onConfigure: _onConfigure,
@@ -137,6 +137,27 @@ class AppDatabase {
       print('✅ Migration to v4 completed');
     }
 
+    if (oldVersion < 5) {
+      // Migration from version 4 to 5: Add participations table
+      await db.execute('''
+        CREATE TABLE participations (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          year INTEGER NOT NULL,
+          month INTEGER NOT NULL,
+          participated INTEGER NOT NULL DEFAULT 0,
+          created_at TEXT NOT NULL,
+          UNIQUE(year, month)
+        )
+      ''');
+
+      await db.execute(
+        'CREATE INDEX idx_participations_year_month ON participations(year, month)',
+      );
+
+      // ignore: avoid_print
+      print('✅ Migration to v5 completed');
+    }
+
     // ignore: avoid_print
     print('✅ All migrations completed successfully');
   }
@@ -194,11 +215,26 @@ class AppDatabase {
       )
     ''');
 
+    // Participations table - stores monthly participation for publishers
+    await db.execute('''
+      CREATE TABLE participations (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        year INTEGER NOT NULL,
+        month INTEGER NOT NULL,
+        participated INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL,
+        UNIQUE(year, month)
+      )
+    ''');
+
     // Create indexes for better query performance
     await db.execute('CREATE INDEX idx_activities_date ON activities(date)');
     await db.execute('CREATE INDEX idx_visits_person ON visits(person_id)');
     await db.execute('CREATE INDEX idx_visits_date ON visits(date)');
     await db.execute('CREATE INDEX idx_goals_year_month ON goals(year, month)');
+    await db.execute(
+      'CREATE INDEX idx_participations_year_month ON participations(year, month)',
+    );
   }
 
   /// Close database connection
