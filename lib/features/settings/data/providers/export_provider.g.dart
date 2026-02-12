@@ -7,7 +7,7 @@ part of 'export_provider.dart';
 // **************************************************************************
 
 String _$generateTextReportHash() =>
-    r'50746c6f50790b0874f60d7fefc9b323ab7bc1e8';
+    r'2dc824040022b644f7d8f17c7c4c95fb3b70d379';
 
 /// Copied from Dart SDK
 class _SystemHash {

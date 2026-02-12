@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/database/daos/person_dao.dart';
 import '../../../../core/database/daos/visit_dao.dart';
 import '../../../../shared/models/visit.dart';
 import '../../../../shared/providers/database_provider.dart';
@@ -125,18 +126,18 @@ Future<List<Visit>> visitsByMonth(
   }
 }
 
-/// Provider for Bible studies count in a specific month
-/// A Bible study is counted if:
-/// - The person has is_bible_study = true
-/// - AND they had at least one visit that month
+/// Provider for Bible studies count
+/// A Bible study is counted if the person has is_bible_study = true
+/// Note: Month parameters are kept for consistency but not used in the query
+/// All active Bible studies are counted regardless of visits that month
 @riverpod
 Future<int> bibleStudiesCountForMonth(
   BibleStudiesCountForMonthRef ref,
   int year,
   int month,
 ) async {
-  final visitDao = await ref.watch(visitDaoProvider.future);
-  return visitDao.countBibleStudiesInMonth(year, month);
+  final personDao = await ref.watch(personDaoProvider.future);
+  return personDao.getBibleStudiesCount();
 }
 
 /// Provider for visit count by person

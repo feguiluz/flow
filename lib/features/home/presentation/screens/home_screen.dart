@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:flow/features/settings/data/providers/export_provider.dart';
 import 'package:flow/shared/models/publisher_type.dart';
 import 'package:flow/shared/providers/user_profile_provider.dart';
 import 'package:flow/features/home/data/providers/goal_notifier.dart';
+import 'package:flow/shared/widgets/app_banner.dart';
 import '../widgets/activity_list.dart';
 import '../widgets/month_summary_card.dart';
 import '../widgets/register_activity_sheet.dart';
@@ -83,6 +85,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return _selectedMonth.year == now.year && _selectedMonth.month == now.month;
   }
 
+  Future<void> _shareMonthReport(BuildContext context, WidgetRef ref) async {
+    try {
+      await shareMonthReport(ref, _selectedMonth.year, _selectedMonth.month);
+      if (context.mounted) {
+        AppBanner.showSuccess(
+          context,
+          'Informe compartido correctamente',
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        AppBanner.showError(
+          context,
+          'Error al compartir: $e',
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -105,6 +126,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       appBar: AppBar(
         title: const Text('Flow'),
         centerTitle: true,
+        actions: [
+          // Share report button
+          IconButton(
+            icon: const Icon(Icons.share),
+            tooltip: 'Compartir informe',
+            onPressed: () => _shareMonthReport(context, ref),
+          ),
+        ],
       ),
       body: Column(
         children: [

@@ -331,36 +331,36 @@ class _VisitsByMonthProviderElement
 }
 
 String _$bibleStudiesCountForMonthHash() =>
-    r'071d0bf51239ce8c6f369e6a43e150751b0e997f';
+    r'9809e6cebde0cf2346e28126f2f75119abf19c5f';
 
-/// Provider for Bible studies count in a specific month
-/// A Bible study is counted if:
-/// - The person has is_bible_study = true
-/// - AND they had at least one visit that month
+/// Provider for Bible studies count
+/// A Bible study is counted if the person has is_bible_study = true
+/// Note: Month parameters are kept for consistency but not used in the query
+/// All active Bible studies are counted regardless of visits that month
 ///
 /// Copied from [bibleStudiesCountForMonth].
 @ProviderFor(bibleStudiesCountForMonth)
 const bibleStudiesCountForMonthProvider = BibleStudiesCountForMonthFamily();
 
-/// Provider for Bible studies count in a specific month
-/// A Bible study is counted if:
-/// - The person has is_bible_study = true
-/// - AND they had at least one visit that month
+/// Provider for Bible studies count
+/// A Bible study is counted if the person has is_bible_study = true
+/// Note: Month parameters are kept for consistency but not used in the query
+/// All active Bible studies are counted regardless of visits that month
 ///
 /// Copied from [bibleStudiesCountForMonth].
 class BibleStudiesCountForMonthFamily extends Family<AsyncValue<int>> {
-  /// Provider for Bible studies count in a specific month
-  /// A Bible study is counted if:
-  /// - The person has is_bible_study = true
-  /// - AND they had at least one visit that month
+  /// Provider for Bible studies count
+  /// A Bible study is counted if the person has is_bible_study = true
+  /// Note: Month parameters are kept for consistency but not used in the query
+  /// All active Bible studies are counted regardless of visits that month
   ///
   /// Copied from [bibleStudiesCountForMonth].
   const BibleStudiesCountForMonthFamily();
 
-  /// Provider for Bible studies count in a specific month
-  /// A Bible study is counted if:
-  /// - The person has is_bible_study = true
-  /// - AND they had at least one visit that month
+  /// Provider for Bible studies count
+  /// A Bible study is counted if the person has is_bible_study = true
+  /// Note: Month parameters are kept for consistency but not used in the query
+  /// All active Bible studies are counted regardless of visits that month
   ///
   /// Copied from [bibleStudiesCountForMonth].
   BibleStudiesCountForMonthProvider call(
@@ -398,17 +398,17 @@ class BibleStudiesCountForMonthFamily extends Family<AsyncValue<int>> {
   String? get name => r'bibleStudiesCountForMonthProvider';
 }
 
-/// Provider for Bible studies count in a specific month
-/// A Bible study is counted if:
-/// - The person has is_bible_study = true
-/// - AND they had at least one visit that month
+/// Provider for Bible studies count
+/// A Bible study is counted if the person has is_bible_study = true
+/// Note: Month parameters are kept for consistency but not used in the query
+/// All active Bible studies are counted regardless of visits that month
 ///
 /// Copied from [bibleStudiesCountForMonth].
 class BibleStudiesCountForMonthProvider extends AutoDisposeFutureProvider<int> {
-  /// Provider for Bible studies count in a specific month
-  /// A Bible study is counted if:
-  /// - The person has is_bible_study = true
-  /// - AND they had at least one visit that month
+  /// Provider for Bible studies count
+  /// A Bible study is counted if the person has is_bible_study = true
+  /// Note: Month parameters are kept for consistency but not used in the query
+  /// All active Bible studies are counted regardless of visits that month
   ///
   /// Copied from [bibleStudiesCountForMonth].
   BibleStudiesCountForMonthProvider(

@@ -7,7 +7,7 @@ part of 'statistics_provider.dart';
 // **************************************************************************
 
 String _$serviceYearStatisticsHash() =>
-    r'28d29319247f892bbcf73721a7dbdc0b048aff81';
+    r'778e10b4f0114159afd2c5b08add1e6e19abdd08';
 
 /// Copied from Dart SDK
 class _SystemHash {

@@ -1,8 +1,9 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import 'package:flow/core/database/daos/person_dao.dart';
 import 'package:flow/features/home/data/providers/activity_notifier.dart';
-import 'package:flow/features/people/data/providers/visit_notifier.dart';
+import 'package:flow/shared/providers/database_provider.dart';
 
 part 'statistics_provider.freezed.dart';
 part 'statistics_provider.g.dart';
@@ -50,13 +51,11 @@ Future<ServiceYearStatistics> serviceYearStatistics(
     }
 
     hoursByMonth[month] = hours;
-
-    // Get bible studies for this month
-    final studies = await ref.watch(
-      bibleStudiesCountForMonthProvider(year, month).future,
-    );
-    totalBibleStudies += studies;
   }
+
+  // Get total active Bible studies (current count, not monthly sum)
+  final personDao = await ref.watch(personDaoProvider.future);
+  totalBibleStudies = await personDao.getBibleStudiesCount();
 
   final averageHours = monthsWithData > 0 ? totalHours / monthsWithData : 0.0;
 

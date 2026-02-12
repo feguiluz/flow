@@ -27,6 +27,11 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
   void initState() {
     super.initState();
     _selectedYear = getCurrentServiceYear();
+
+    // Refresh statistics when entering the screen
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.invalidate(serviceYearStatisticsProvider);
+    });
   }
 
   void _goToPreviousYear() {
@@ -78,132 +83,152 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
           ),
         ],
       ),
-      body: statisticsAsync.when(
-        data: (statistics) {
-          if (statistics.monthsWithData == 0) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.bar_chart,
-                    size: 64,
-                    color: colorScheme.onSurfaceVariant.withOpacity(0.5),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Sin datos para este año',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Registra horas para ver estadísticas',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          return ListView(
-            children: [
-              // Summary Cards
-              SummaryCards(
-                totalHours: statistics.totalHours,
-                averageHours: statistics.averageHours,
-                totalBibleStudies: statistics.totalBibleStudies,
-                monthsWithData: statistics.monthsWithData,
-              ),
-
-              // Hours Chart
-              HoursChart(
-                hoursByMonth: statistics.hoursByMonth,
-                goalHours: goalHours,
-              ),
-
-              // Additional info
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          ref.invalidate(serviceYearStatisticsProvider);
+        },
+        child: statisticsAsync.when(
+          data: (statistics) {
+            if (statistics.monthsWithData == 0) {
+              return SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height - 200,
+                  child: Center(
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          'Información del Año de Servicio',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                        Icon(
+                          Icons.bar_chart,
+                          size: 64,
+                          color: colorScheme.onSurfaceVariant.withOpacity(0.5),
                         ),
                         const SizedBox(height: 16),
-                        _buildInfoRow(
-                          context,
-                          'Periodo',
-                          'Septiembre $_selectedYear - Agosto ${_selectedYear + 1}',
-                        ),
-                        const Divider(height: 24),
-                        _buildInfoRow(
-                          context,
-                          'Meses activos',
-                          '${statistics.monthsWithData} de 12',
-                        ),
-                        const Divider(height: 24),
-                        _buildInfoRow(
-                          context,
-                          'Total de horas',
-                          '${statistics.totalHours.toStringAsFixed(1)} h',
-                        ),
-                        if (goalHours != null) ...[
-                          const Divider(height: 24),
-                          _buildInfoRow(
-                            context,
-                            'Meta anual',
-                            '${(goalHours * 12).toStringAsFixed(0)} h',
+                        Text(
+                          'Sin datos para este año',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
                           ),
-                          const Divider(height: 24),
-                          _buildInfoRow(
-                            context,
-                            'Progreso',
-                            '${((statistics.totalHours / (goalHours * 12)) * 100).toStringAsFixed(1)}%',
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Registra horas para ver estadísticas',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
                           ),
-                        ],
+                        ),
                       ],
                     ),
                   ),
                 ),
-              ),
-            ],
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.error_outline,
-                size: 64,
-                color: colorScheme.error,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Error al cargar estadísticas',
-                style: theme.textTheme.titleMedium,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                error.toString(),
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
+              );
+            }
+
+            return ListView(
+              children: [
+                // Summary Cards
+                SummaryCards(
+                  totalHours: statistics.totalHours,
+                  averageHours: statistics.averageHours,
+                  totalBibleStudies: statistics.totalBibleStudies,
+                  monthsWithData: statistics.monthsWithData,
                 ),
-                textAlign: TextAlign.center,
+
+                // Hours Chart
+                HoursChart(
+                  hoursByMonth: statistics.hoursByMonth,
+                  goalHours: goalHours,
+                ),
+
+                // Additional info
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Información del Año de Servicio',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          _buildInfoRow(
+                            context,
+                            'Periodo',
+                            'Septiembre $_selectedYear - Agosto ${_selectedYear + 1}',
+                          ),
+                          const Divider(height: 24),
+                          _buildInfoRow(
+                            context,
+                            'Meses activos',
+                            '${statistics.monthsWithData} de 12',
+                          ),
+                          const Divider(height: 24),
+                          _buildInfoRow(
+                            context,
+                            'Total de horas',
+                            '${statistics.totalHours.toStringAsFixed(1)} h',
+                          ),
+                          if (goalHours != null) ...[
+                            const Divider(height: 24),
+                            _buildInfoRow(
+                              context,
+                              'Meta anual',
+                              '${(goalHours * 12).toStringAsFixed(0)} h',
+                            ),
+                            const Divider(height: 24),
+                            _buildInfoRow(
+                              context,
+                              'Progreso',
+                              '${((statistics.totalHours / (goalHours * 12)) * 100).toStringAsFixed(1)}%',
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, stack) => SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: SizedBox(
+              height: MediaQuery.of(context).size.height - 200,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      size: 64,
+                      color: colorScheme.error,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Error al cargar estadísticas',
+                      style: theme.textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Text(
+                        error.toString(),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ],
+            ),
           ),
         ),
       ),

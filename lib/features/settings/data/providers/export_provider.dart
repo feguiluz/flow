@@ -4,6 +4,7 @@ import 'package:share_plus/share_plus.dart';
 
 import 'package:flow/core/utils/date_formatter.dart';
 import 'package:flow/features/home/data/providers/activity_notifier.dart';
+import 'package:flow/features/home/data/providers/goal_notifier.dart';
 import 'package:flow/features/home/data/providers/participation_notifier.dart';
 import 'package:flow/features/people/data/providers/visit_notifier.dart';
 import 'package:flow/shared/models/publisher_type.dart';
@@ -32,9 +33,22 @@ Future<String> generateTextReport(
   buffer.writeln('Nombre: $userName');
   buffer.writeln('');
 
-  // Different format based on publisher type
-  if (userProfile.publisherType == PublisherType.publisher) {
-    // Publisher without goal - only participation
+  // Get bible studies count (all publisher types report this)
+  final bibleStudiesCount = await ref.watch(
+    bibleStudiesCountForMonthProvider(year, month).future,
+  );
+
+  // Check if publisher has an auxiliary goal this month
+  final hasAuxiliaryGoal = userProfile.publisherType == PublisherType.publisher
+      ? (await ref.watch(goalNotifierProvider(year, month).future)) != null
+      : false;
+
+  // Different format based on publisher type and auxiliary goal
+  final isPublisherWithoutGoal =
+      userProfile.publisherType == PublisherType.publisher && !hasAuxiliaryGoal;
+
+  if (isPublisherWithoutGoal) {
+    // Publisher without goal - participation and bible studies only
     final participation = await ref.watch(
       participationNotifierProvider(year, month).future,
     );
@@ -44,27 +58,21 @@ Future<String> generateTextReport(
     } else {
       buffer.writeln('❌ No participé en el ministerio');
     }
+    buffer.writeln('📚 Cursos Bíblicos: $bibleStudiesCount');
   } else {
-    // Pioneer (Regular or Special) - hours and bible studies
+    // Pioneer (Regular, Special, or Auxiliary) - hours and bible studies
 
-    // Get total hours
+    // Get total minutes
     final totalMinutes = await ref.watch(
       getTotalMinutesForMonthProvider(year: year, month: month).future,
     );
-    final hours = totalMinutes / 60.0;
 
-    // Get bible studies count
-    final bibleStudiesCount = await ref.watch(
-      bibleStudiesCountForMonthProvider(year, month).future,
-    );
+    // Convert to hours only (truncate minutes, always round down)
+    final hours = totalMinutes ~/ 60;
 
-    buffer.writeln('⏱️ Horas: ${hours.toStringAsFixed(1)}');
+    buffer.writeln('⏱️ Horas: $hours');
     buffer.writeln('📚 Cursos Bíblicos: $bibleStudiesCount');
   }
-
-  buffer.writeln('');
-  buffer.writeln('---');
-  buffer.writeln('Generado con Flow');
 
   return buffer.toString();
 }
@@ -75,10 +83,11 @@ Future<void> shareMonthReport(WidgetRef ref, int year, int month) async {
     final report = await ref.read(
       generateTextReportProvider(year, month).future,
     );
-    
+
     await Share.share(
       report,
-      subject: 'Informe de Predicación - ${DateFormatter.getMonthName(month)} $year',
+      subject:
+          'Informe de Predicación - ${DateFormatter.getMonthName(month)} $year',
     );
   } catch (e) {
     throw Exception('Error al compartir informe: $e');
@@ -90,5 +99,4 @@ Future<void> shareMonthReport(WidgetRef ref, int year, int month) async {
 Future<void> generatePdfReport(WidgetRef ref, int year, int month) async {
   // TODO: Implement PDF generation using pdf package
   throw UnimplementedError('PDF export coming soon');
-}
 }
