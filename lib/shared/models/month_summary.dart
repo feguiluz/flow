@@ -64,7 +64,15 @@ class MonthSummary with _$MonthSummary {
     if (targetHours == 0.0) return 'Sin meta establecida';
     if (isGoalMet) return '¡Meta cumplida!';
     if (remainingHours == 0.0) return '¡Meta cumplida!';
-    return 'Faltan ${remainingHours.toStringAsFixed(1)} horas';
+
+    // Format remaining hours as "Xh Ymin"
+    final hours = remainingHours.floor();
+    final minutes = ((remainingHours - hours) * 60).round();
+
+    if (minutes == 0) {
+      return 'Faltan ${hours}h';
+    }
+    return 'Faltan ${hours}h ${minutes}min';
   }
 }
 

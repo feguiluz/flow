@@ -70,8 +70,24 @@ class MonthSummaryCard extends ConsumerWidget {
     final capitalizedMonth =
         monthName[0].toUpperCase() + monthName.substring(1);
 
+    // Check if goal is met for special styling
+    final isGoalMet = summary.isGoalMet && summary.targetHours > 0;
+
+    // Use theme's secondary color (teal) for success state
+    final successColor = colorScheme.secondary;
+    final borderColor = isGoalMet ? successColor : null;
+
     return Card(
-      elevation: 2,
+      elevation: isGoalMet ? 4 : 2,
+      shape: isGoalMet && borderColor != null
+          ? RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(
+                color: borderColor,
+                width: 3,
+              ),
+            )
+          : null,
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
@@ -100,7 +116,7 @@ class MonthSummaryCard extends ConsumerWidget {
             // Show different content based on user type and goal status
             if (summary.targetHours > 0) ...[
               // Has target hours: Show goal info and progress
-              _buildGoalInfo(theme, colorScheme, summary),
+              _buildGoalInfo(theme, colorScheme, summary, profile),
               const SizedBox(height: 16),
               _buildProgressBar(colorScheme, summary),
               const SizedBox(height: 16),
@@ -127,11 +143,12 @@ class MonthSummaryCard extends ConsumerWidget {
     ThemeData theme,
     ColorScheme colorScheme,
     MonthSummary summary,
+    dynamic profile,
   ) {
-    // Get label from goal if it exists, otherwise show "Meta automática"
+    // Get label from goal if it exists, otherwise show publisher type label
     final goalTypeLabel = summary.goal != null
         ? _getGoalTypeLabel(summary.goal!.goalType)
-        : 'Meta automática';
+        : _getPublisherTypeLabel(profile?.publisherType);
 
     return Row(
       children: [
@@ -142,7 +159,7 @@ class MonthSummaryCard extends ConsumerWidget {
         ),
         const SizedBox(width: 8),
         Text(
-          '$goalTypeLabel - ${summary.targetHours.toStringAsFixed(0)} horas',
+          goalTypeLabel,
           style: theme.textTheme.titleMedium?.copyWith(
             color: colorScheme.primary,
             fontWeight: FontWeight.w600,
@@ -169,13 +186,15 @@ class MonthSummaryCard extends ConsumerWidget {
   }
 
   Widget _buildProgressBar(ColorScheme colorScheme, MonthSummary summary) {
-    // Get color based on progress
-    final progressColor = switch (summary.progressColor) {
-      ProgressColor.green => colorScheme.primary,
-      ProgressColor.yellow => Colors.orange,
-      ProgressColor.red => colorScheme.error,
-      ProgressColor.gray => colorScheme.outline,
-    };
+    // Get color based on progress - use secondary (teal) when goal is met
+    final progressColor = summary.isGoalMet
+        ? colorScheme.secondary
+        : switch (summary.progressColor) {
+            ProgressColor.green => colorScheme.primary,
+            ProgressColor.yellow => Colors.orange,
+            ProgressColor.red => colorScheme.error,
+            ProgressColor.gray => colorScheme.outline,
+          };
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -185,7 +204,7 @@ class MonthSummaryCard extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              '${summary.totalHours.toStringAsFixed(1)} / ${summary.targetHours.toStringAsFixed(0)} h',
+              '${_formatHours(summary.totalHours)} / ${summary.targetHours.toStringAsFixed(0)}h',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -223,37 +242,12 @@ class MonthSummaryCard extends ConsumerWidget {
     ColorScheme colorScheme,
     MonthSummary summary,
   ) {
+    // Use theme's secondary color (teal) for success state
+    final successColor = colorScheme.secondary;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Status message
-        if (summary.goal != null)
-          Row(
-            children: [
-              Icon(
-                summary.isGoalMet
-                    ? Icons.check_circle_outline
-                    : Icons.schedule_outlined,
-                size: 20,
-                color: summary.isGoalMet
-                    ? colorScheme.primary
-                    : colorScheme.onSurfaceVariant,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                summary.statusMessage,
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.w500,
-                  color: summary.isGoalMet
-                      ? colorScheme.primary
-                      : colorScheme.onSurface,
-                ),
-              ),
-            ],
-          ),
-
-        const SizedBox(height: 8),
-
         // Bible studies count
         Row(
           children: [
@@ -288,12 +282,13 @@ class MonthSummaryCard extends ConsumerWidget {
 
     if (profile?.publisherType != PublisherType.publisher) {
       // Show info dialog for pioneers
+      final pioneerLabel = _getPublisherTypeLabel(profile?.publisherType);
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Meta automática'),
-          content: const Text(
-            'Como precursor regular o especial, tu meta es automática según tu privilegio y no puede ser modificada.',
+          title: Text(pioneerLabel),
+          content: Text(
+            'Como ${pioneerLabel.toLowerCase()}, tu meta es automática según tu privilegio y no puede ser modificada.',
           ),
           actions: [
             TextButton(
@@ -320,12 +315,33 @@ class MonthSummaryCard extends ConsumerWidget {
     final typeStr = goalType.toString().split('.').last;
     return switch (typeStr) {
       'publisher' => 'Publicador',
-      'auxiliaryPioneer15' => 'Precursor Auxiliar',
-      'auxiliaryPioneer30' => 'Precursor Auxiliar',
-      'regularPioneer' => 'Precursor Regular',
-      'specialPioneer' => 'Precursor Especial',
+      'auxiliaryPioneer15' => 'Precursorado Auxiliar',
+      'auxiliaryPioneer30' => 'Precursorado Auxiliar',
+      'regularPioneer' => 'Precursorado Regular',
+      'specialPioneer' => 'Precursorado Especial',
       'missionary' => 'Misionero',
       _ => 'Sin meta',
     };
+  }
+
+  String _getPublisherTypeLabel(PublisherType? publisherType) {
+    if (publisherType == null) return 'Sin meta';
+
+    return switch (publisherType) {
+      PublisherType.publisher => 'Publicador',
+      PublisherType.regularPioneer => 'Precursorado Regular',
+      PublisherType.specialPioneer => 'Precursorado Especial',
+    };
+  }
+
+  /// Format hours as "Xh Ymin" or "Xh" if no minutes
+  String _formatHours(double hours) {
+    final wholeHours = hours.floor();
+    final minutes = ((hours - wholeHours) * 60).round();
+
+    if (minutes == 0) {
+      return '${wholeHours}h';
+    }
+    return '${wholeHours}h ${minutes}min';
   }
 }

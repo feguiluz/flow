@@ -86,7 +86,7 @@ class SettingsScreen extends ConsumerWidget {
                     const SizedBox(height: 8),
                     _buildInfoRow(
                       context,
-                      Icons.cake,
+                      Icons.calendar_today,
                       'Edad',
                       profile.age != null
                           ? '${profile.age} años'
