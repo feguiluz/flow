@@ -45,5 +45,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Flow necesita tu ubicación para guardar la dirección de las personas</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Flow necesita tu ubicación para guardar la dirección de las personas</string>
 </dict>
 </plist>

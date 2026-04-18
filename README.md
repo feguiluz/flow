@@ -46,9 +46,17 @@ dart run build_runner build --delete-conflicting-outputs
 ```
 
 4. Ejecuta la app
+
+**Para móvil:**
 ```bash
 flutter run
 ```
+
+**Para web (con persistencia de datos):**
+```bash
+flutter run -d chrome --web-port=8080
+```
+> ⚠️ **Importante**: Usa siempre el mismo puerto (--web-port=8080) para que los datos persistan entre sesiones. Ver [RUN_WEB.md](RUN_WEB.md) para más detalles.
 
 ## 📖 Documentación
 

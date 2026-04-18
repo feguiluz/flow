@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -16,21 +17,38 @@ class AppDatabase {
   /// Get database instance, creating it if it doesn't exist
   Future<Database> get database async {
     if (_database != null) return _database!;
-    _database = await _initDB('flow.db');
+    _database = await _initDB(kIsWeb ? 'flow_app.db' : 'flow.db');
     return _database!;
   }
 
   /// Initialize database with schema
   Future<Database> _initDB(String filePath) async {
-    final dbPath = await getDatabasesPath();
-    final path = join(dbPath, filePath);
+    String path;
 
-    return await openDatabase(
+    if (kIsWeb) {
+      // For web, use a simple database name (stored in IndexedDB)
+      path = filePath;
+      // ignore: avoid_print
+      print('📦 Opening database for web: $path');
+    } else {
+      // For mobile/desktop, use the standard databases path
+      final dbPath = await getDatabasesPath();
+      path = join(dbPath, filePath);
+      // ignore: avoid_print
+      print('📦 Opening database at: $path');
+    }
+
+    final db = await openDatabase(
       path,
-      version: 1,
+      version: 5, // Incremented to add participations table
       onCreate: _createDB,
+      onUpgrade: _upgradeDB,
       onConfigure: _onConfigure,
     );
+
+    // ignore: avoid_print
+    print('✅ Database opened successfully');
+    return db;
   }
 
   /// Configure database settings
@@ -39,14 +57,119 @@ class AppDatabase {
     await db.execute('PRAGMA foreign_keys = ON');
   }
 
+  /// Upgrade database schema
+  Future<void> _upgradeDB(Database db, int oldVersion, int newVersion) async {
+    // ignore: avoid_print
+    print('📦 Migrating database from v$oldVersion to v$newVersion');
+
+    if (oldVersion < 2) {
+      // Migration from version 1 to 2: Change hours (REAL) to minutes (INTEGER)
+      // 1. Create new table with minutes
+      await db.execute('''
+        CREATE TABLE activities_new (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          date TEXT NOT NULL,
+          minutes INTEGER NOT NULL,
+          notes TEXT,
+          created_at TEXT NOT NULL
+        )
+      ''');
+
+      // 2. Copy data, converting hours to minutes
+      await db.execute('''
+        INSERT INTO activities_new (id, date, minutes, notes, created_at)
+        SELECT id, date, CAST(hours * 60 AS INTEGER), notes, created_at
+        FROM activities
+      ''');
+
+      // 3. Drop old table
+      await db.execute('DROP TABLE activities');
+
+      // 4. Rename new table
+      await db.execute('ALTER TABLE activities_new RENAME TO activities');
+
+      // ignore: avoid_print
+      print('✅ Migration to v2 completed');
+    }
+
+    if (oldVersion < 3) {
+      // Migration from version 2 to 3: Remove counted_as_study from visits
+      // 1. Create new visits table without counted_as_study
+      await db.execute('''
+        CREATE TABLE visits_new (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          person_id INTEGER NOT NULL,
+          date TEXT NOT NULL,
+          notes TEXT,
+          created_at TEXT NOT NULL,
+          FOREIGN KEY (person_id) REFERENCES people (id) ON DELETE CASCADE
+        )
+      ''');
+
+      // 2. Copy data (all visits, regardless of counted_as_study value)
+      await db.execute('''
+        INSERT INTO visits_new (id, person_id, date, notes, created_at)
+        SELECT id, person_id, date, notes, created_at
+        FROM visits
+      ''');
+
+      // 3. Drop old table
+      await db.execute('DROP TABLE visits');
+
+      // 4. Rename new table
+      await db.execute('ALTER TABLE visits_new RENAME TO visits');
+
+      // 5. Recreate indexes
+      await db.execute('CREATE INDEX idx_visits_person ON visits(person_id)');
+      await db.execute('CREATE INDEX idx_visits_date ON visits(date)');
+
+      // ignore: avoid_print
+      print('✅ Migration to v3 completed');
+    }
+
+    if (oldVersion < 4) {
+      // Migration from version 3 to 4: Add location fields to people
+      // SQLite doesn't support multiple ADD COLUMN in one statement
+      await db.execute('ALTER TABLE people ADD COLUMN latitude REAL');
+      await db.execute('ALTER TABLE people ADD COLUMN longitude REAL');
+
+      // ignore: avoid_print
+      print('✅ Migration to v4 completed');
+    }
+
+    if (oldVersion < 5) {
+      // Migration from version 4 to 5: Add participations table
+      await db.execute('''
+        CREATE TABLE participations (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          year INTEGER NOT NULL,
+          month INTEGER NOT NULL,
+          participated INTEGER NOT NULL DEFAULT 0,
+          created_at TEXT NOT NULL,
+          UNIQUE(year, month)
+        )
+      ''');
+
+      await db.execute(
+        'CREATE INDEX idx_participations_year_month ON participations(year, month)',
+      );
+
+      // ignore: avoid_print
+      print('✅ Migration to v5 completed');
+    }
+
+    // ignore: avoid_print
+    print('✅ All migrations completed successfully');
+  }
+
   /// Create database schema
   Future<void> _createDB(Database db, int version) async {
-    // Activities table - stores daily ministry hours
+    // Activities table - stores daily ministry hours (now in minutes)
     await db.execute('''
       CREATE TABLE activities (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         date TEXT NOT NULL,
-        hours REAL NOT NULL,
+        minutes INTEGER NOT NULL,
         notes TEXT,
         created_at TEXT NOT NULL
       )
@@ -61,6 +184,8 @@ class AppDatabase {
         address TEXT,
         notes TEXT,
         is_bible_study INTEGER NOT NULL DEFAULT 0,
+        latitude REAL,
+        longitude REAL,
         created_at TEXT NOT NULL
       )
     ''');
@@ -72,7 +197,6 @@ class AppDatabase {
         person_id INTEGER NOT NULL,
         date TEXT NOT NULL,
         notes TEXT,
-        counted_as_study INTEGER NOT NULL DEFAULT 0,
         created_at TEXT NOT NULL,
         FOREIGN KEY (person_id) REFERENCES people (id) ON DELETE CASCADE
       )
@@ -91,11 +215,26 @@ class AppDatabase {
       )
     ''');
 
+    // Participations table - stores monthly participation for publishers
+    await db.execute('''
+      CREATE TABLE participations (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        year INTEGER NOT NULL,
+        month INTEGER NOT NULL,
+        participated INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL,
+        UNIQUE(year, month)
+      )
+    ''');
+
     // Create indexes for better query performance
     await db.execute('CREATE INDEX idx_activities_date ON activities(date)');
     await db.execute('CREATE INDEX idx_visits_person ON visits(person_id)');
     await db.execute('CREATE INDEX idx_visits_date ON visits(date)');
     await db.execute('CREATE INDEX idx_goals_year_month ON goals(year, month)');
+    await db.execute(
+      'CREATE INDEX idx_participations_year_month ON participations(year, month)',
+    );
   }
 
   /// Close database connection

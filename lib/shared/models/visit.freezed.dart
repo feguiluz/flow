@@ -24,7 +24,6 @@ mixin _$Visit {
   int get personId => throw _privateConstructorUsedError;
   DateTime get date => throw _privateConstructorUsedError;
   String? get notes => throw _privateConstructorUsedError;
-  bool get countedAsStudy => throw _privateConstructorUsedError;
   DateTime get createdAt => throw _privateConstructorUsedError;
 
   /// Serializes this Visit to a JSON map.
@@ -46,7 +45,6 @@ abstract class $VisitCopyWith<$Res> {
       int personId,
       DateTime date,
       String? notes,
-      bool countedAsStudy,
       DateTime createdAt});
 }
 
@@ -69,7 +67,6 @@ class _$VisitCopyWithImpl<$Res, $Val extends Visit>
     Object? personId = null,
     Object? date = null,
     Object? notes = freezed,
-    Object? countedAsStudy = null,
     Object? createdAt = null,
   }) {
     return _then(_value.copyWith(
@@ -89,10 +86,6 @@ class _$VisitCopyWithImpl<$Res, $Val extends Visit>
           ? _value.notes
           : notes // ignore: cast_nullable_to_non_nullable
               as String?,
-      countedAsStudy: null == countedAsStudy
-          ? _value.countedAsStudy
-          : countedAsStudy // ignore: cast_nullable_to_non_nullable
-              as bool,
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -113,7 +106,6 @@ abstract class _$$VisitImplCopyWith<$Res> implements $VisitCopyWith<$Res> {
       int personId,
       DateTime date,
       String? notes,
-      bool countedAsStudy,
       DateTime createdAt});
 }
 
@@ -134,7 +126,6 @@ class __$$VisitImplCopyWithImpl<$Res>
     Object? personId = null,
     Object? date = null,
     Object? notes = freezed,
-    Object? countedAsStudy = null,
     Object? createdAt = null,
   }) {
     return _then(_$VisitImpl(
@@ -154,10 +145,6 @@ class __$$VisitImplCopyWithImpl<$Res>
           ? _value.notes
           : notes // ignore: cast_nullable_to_non_nullable
               as String?,
-      countedAsStudy: null == countedAsStudy
-          ? _value.countedAsStudy
-          : countedAsStudy // ignore: cast_nullable_to_non_nullable
-              as bool,
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -174,7 +161,6 @@ class _$VisitImpl implements _Visit {
       required this.personId,
       required this.date,
       this.notes,
-      required this.countedAsStudy,
       required this.createdAt});
 
   factory _$VisitImpl.fromJson(Map<String, dynamic> json) =>
@@ -189,13 +175,11 @@ class _$VisitImpl implements _Visit {
   @override
   final String? notes;
   @override
-  final bool countedAsStudy;
-  @override
   final DateTime createdAt;
 
   @override
   String toString() {
-    return 'Visit(id: $id, personId: $personId, date: $date, notes: $notes, countedAsStudy: $countedAsStudy, createdAt: $createdAt)';
+    return 'Visit(id: $id, personId: $personId, date: $date, notes: $notes, createdAt: $createdAt)';
   }
 
   @override
@@ -208,16 +192,14 @@ class _$VisitImpl implements _Visit {
                 other.personId == personId) &&
             (identical(other.date, date) || other.date == date) &&
             (identical(other.notes, notes) || other.notes == notes) &&
-            (identical(other.countedAsStudy, countedAsStudy) ||
-                other.countedAsStudy == countedAsStudy) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, id, personId, date, notes, countedAsStudy, createdAt);
+  int get hashCode =>
+      Object.hash(runtimeType, id, personId, date, notes, createdAt);
 
   /// Create a copy of Visit
   /// with the given fields replaced by the non-null parameter values.
@@ -241,7 +223,6 @@ abstract class _Visit implements Visit {
       required final int personId,
       required final DateTime date,
       final String? notes,
-      required final bool countedAsStudy,
       required final DateTime createdAt}) = _$VisitImpl;
 
   factory _Visit.fromJson(Map<String, dynamic> json) = _$VisitImpl.fromJson;
@@ -254,8 +235,6 @@ abstract class _Visit implements Visit {
   DateTime get date;
   @override
   String? get notes;
-  @override
-  bool get countedAsStudy;
   @override
   DateTime get createdAt;
 

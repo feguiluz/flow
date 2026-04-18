@@ -9,7 +9,7 @@ class Activity with _$Activity {
   const factory Activity({
     required int? id,
     required DateTime date,
-    required double hours,
+    required int minutes, // Total minutes (e.g., 150 = 2h 30m)
     String? notes,
     required DateTime createdAt,
   }) = _Activity;

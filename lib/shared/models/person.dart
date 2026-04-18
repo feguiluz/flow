@@ -7,12 +7,14 @@ part 'person.g.dart';
 @freezed
 class Person with _$Person {
   const factory Person({
-    required int? id,
+    int? id,
     required String name,
     String? phone,
     String? address,
     String? notes,
     required bool isBibleStudy,
+    double? latitude,
+    double? longitude,
     required DateTime createdAt,
   }) = _Person;
 

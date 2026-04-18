@@ -26,6 +26,8 @@ mixin _$Person {
   String? get address => throw _privateConstructorUsedError;
   String? get notes => throw _privateConstructorUsedError;
   bool get isBibleStudy => throw _privateConstructorUsedError;
+  double? get latitude => throw _privateConstructorUsedError;
+  double? get longitude => throw _privateConstructorUsedError;
   DateTime get createdAt => throw _privateConstructorUsedError;
 
   /// Serializes this Person to a JSON map.
@@ -49,6 +51,8 @@ abstract class $PersonCopyWith<$Res> {
       String? address,
       String? notes,
       bool isBibleStudy,
+      double? latitude,
+      double? longitude,
       DateTime createdAt});
 }
 
@@ -73,6 +77,8 @@ class _$PersonCopyWithImpl<$Res, $Val extends Person>
     Object? address = freezed,
     Object? notes = freezed,
     Object? isBibleStudy = null,
+    Object? latitude = freezed,
+    Object? longitude = freezed,
     Object? createdAt = null,
   }) {
     return _then(_value.copyWith(
@@ -100,6 +106,14 @@ class _$PersonCopyWithImpl<$Res, $Val extends Person>
           ? _value.isBibleStudy
           : isBibleStudy // ignore: cast_nullable_to_non_nullable
               as bool,
+      latitude: freezed == latitude
+          ? _value.latitude
+          : latitude // ignore: cast_nullable_to_non_nullable
+              as double?,
+      longitude: freezed == longitude
+          ? _value.longitude
+          : longitude // ignore: cast_nullable_to_non_nullable
+              as double?,
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -122,6 +136,8 @@ abstract class _$$PersonImplCopyWith<$Res> implements $PersonCopyWith<$Res> {
       String? address,
       String? notes,
       bool isBibleStudy,
+      double? latitude,
+      double? longitude,
       DateTime createdAt});
 }
 
@@ -144,6 +160,8 @@ class __$$PersonImplCopyWithImpl<$Res>
     Object? address = freezed,
     Object? notes = freezed,
     Object? isBibleStudy = null,
+    Object? latitude = freezed,
+    Object? longitude = freezed,
     Object? createdAt = null,
   }) {
     return _then(_$PersonImpl(
@@ -171,6 +189,14 @@ class __$$PersonImplCopyWithImpl<$Res>
           ? _value.isBibleStudy
           : isBibleStudy // ignore: cast_nullable_to_non_nullable
               as bool,
+      latitude: freezed == latitude
+          ? _value.latitude
+          : latitude // ignore: cast_nullable_to_non_nullable
+              as double?,
+      longitude: freezed == longitude
+          ? _value.longitude
+          : longitude // ignore: cast_nullable_to_non_nullable
+              as double?,
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -183,12 +209,14 @@ class __$$PersonImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$PersonImpl implements _Person {
   const _$PersonImpl(
-      {required this.id,
+      {this.id,
       required this.name,
       this.phone,
       this.address,
       this.notes,
       required this.isBibleStudy,
+      this.latitude,
+      this.longitude,
       required this.createdAt});
 
   factory _$PersonImpl.fromJson(Map<String, dynamic> json) =>
@@ -207,11 +235,15 @@ class _$PersonImpl implements _Person {
   @override
   final bool isBibleStudy;
   @override
+  final double? latitude;
+  @override
+  final double? longitude;
+  @override
   final DateTime createdAt;
 
   @override
   String toString() {
-    return 'Person(id: $id, name: $name, phone: $phone, address: $address, notes: $notes, isBibleStudy: $isBibleStudy, createdAt: $createdAt)';
+    return 'Person(id: $id, name: $name, phone: $phone, address: $address, notes: $notes, isBibleStudy: $isBibleStudy, latitude: $latitude, longitude: $longitude, createdAt: $createdAt)';
   }
 
   @override
@@ -226,14 +258,18 @@ class _$PersonImpl implements _Person {
             (identical(other.notes, notes) || other.notes == notes) &&
             (identical(other.isBibleStudy, isBibleStudy) ||
                 other.isBibleStudy == isBibleStudy) &&
+            (identical(other.latitude, latitude) ||
+                other.latitude == latitude) &&
+            (identical(other.longitude, longitude) ||
+                other.longitude == longitude) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, id, name, phone, address, notes, isBibleStudy, createdAt);
+  int get hashCode => Object.hash(runtimeType, id, name, phone, address, notes,
+      isBibleStudy, latitude, longitude, createdAt);
 
   /// Create a copy of Person
   /// with the given fields replaced by the non-null parameter values.
@@ -253,12 +289,14 @@ class _$PersonImpl implements _Person {
 
 abstract class _Person implements Person {
   const factory _Person(
-      {required final int? id,
+      {final int? id,
       required final String name,
       final String? phone,
       final String? address,
       final String? notes,
       required final bool isBibleStudy,
+      final double? latitude,
+      final double? longitude,
       required final DateTime createdAt}) = _$PersonImpl;
 
   factory _Person.fromJson(Map<String, dynamic> json) = _$PersonImpl.fromJson;
@@ -275,6 +313,10 @@ abstract class _Person implements Person {
   String? get notes;
   @override
   bool get isBibleStudy;
+  @override
+  double? get latitude;
+  @override
+  double? get longitude;
   @override
   DateTime get createdAt;
 
