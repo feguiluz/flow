@@ -87,7 +87,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Future<void> _shareMonthReport(BuildContext context, WidgetRef ref) async {
     try {
-      await shareMonthReport(ref, _selectedMonth.year, _selectedMonth.month);
+      // Get the position of the share button for iOS
+      final box = context.findRenderObject() as RenderBox?;
+      final sharePositionOrigin =
+          box != null ? box.localToGlobal(Offset.zero) & box.size : null;
+
+      await shareMonthReport(
+        ref,
+        _selectedMonth.year,
+        _selectedMonth.month,
+        sharePositionOrigin: sharePositionOrigin,
+      );
       if (context.mounted) {
         AppBanner.showSuccess(
           context,
@@ -226,11 +236,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ],
       ),
       floatingActionButton: canRegisterHours
-          ? FloatingActionButton.extended(
+          ? FloatingActionButton(
               onPressed: _showRegisterSheet,
-              icon: const Icon(Icons.add),
-              label: const Text('Registrar'),
               tooltip: 'Registrar horas',
+              child: const Icon(Icons.add),
             )
           : null,
     );
