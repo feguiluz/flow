@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:share_plus/share_plus.dart';
@@ -78,7 +79,14 @@ Future<String> generateTextReport(
 }
 
 /// Share report via WhatsApp or other apps
-Future<void> shareMonthReport(WidgetRef ref, int year, int month) async {
+///
+/// For iOS, sharePositionOrigin is required to position the share sheet
+Future<void> shareMonthReport(
+  WidgetRef ref,
+  int year,
+  int month, {
+  Rect? sharePositionOrigin,
+}) async {
   try {
     final report = await ref.read(
       generateTextReportProvider(year, month).future,
@@ -88,6 +96,7 @@ Future<void> shareMonthReport(WidgetRef ref, int year, int month) async {
       report,
       subject:
           'Informe de Predicación - ${DateFormatter.getMonthName(month)} $year',
+      sharePositionOrigin: sharePositionOrigin,
     );
   } catch (e) {
     throw Exception('Error al compartir informe: $e');
