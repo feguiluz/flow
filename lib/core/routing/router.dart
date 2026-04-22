@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flow/core/services/user_profile_service.dart';
 import 'package:flow/features/home/presentation/screens/home_screen.dart';
 import 'package:flow/features/onboarding/presentation/screens/onboarding_screen.dart';
+import 'package:flow/features/onboarding/presentation/screens/welcome_screen.dart';
 import 'package:flow/features/people/presentation/screens/people_screen.dart';
 import 'package:flow/features/settings/presentation/screens/settings_screen.dart';
 import 'package:flow/features/statistics/presentation/screens/statistics_screen.dart';
@@ -58,27 +59,32 @@ class ScaffoldWithNavBar extends StatelessWidget {
 
 /// GoRouter configuration for the app
 final router = GoRouter(
-  initialLocation: '/home',
+  initialLocation: '/welcome',
   redirect: (context, state) {
     final userProfile = UserProfileService.instance;
     final needsOnboarding = userProfile.needsOnboarding();
-    final isOnboardingRoute = state.matchedLocation == '/onboarding';
+    final location = state.matchedLocation;
+    final isPreHomeRoute = location == '/welcome' || location == '/onboarding';
 
-    // If needs onboarding and not already there, redirect to onboarding
-    if (needsOnboarding && !isOnboardingRoute) {
-      return '/onboarding';
+    // First launch: send the user to the welcome screen (which in turn
+    // lets them choose between starting onboarding or importing a backup).
+    if (needsOnboarding && !isPreHomeRoute) {
+      return '/welcome';
     }
 
-    // If doesn't need onboarding and on onboarding route, redirect to home
-    if (!needsOnboarding && isOnboardingRoute) {
+    // Profile already complete — don't let the user land back on the
+    // welcome/onboarding flow.
+    if (!needsOnboarding && isPreHomeRoute) {
       return '/home';
     }
 
-    // No redirect needed
     return null;
   },
   routes: [
-    // Onboarding route (outside StatefulShellRoute)
+    GoRoute(
+      path: '/welcome',
+      builder: (context, state) => const WelcomeScreen(),
+    ),
     GoRoute(
       path: '/onboarding',
       builder: (context, state) => const OnboardingScreen(),

@@ -370,4 +370,65 @@ class UserProfileService {
     await _preferences.remove(AppConstants.keyUserAge);
     // Don't clear theme mode - keep user preference
   }
+
+  // ==================== Backup / Restore ====================
+
+  /// All SharedPreferences keys owned by this service, including theme
+  /// and deprecated legacy keys. Note: `keyGender` and the legacy
+  /// `keyUserGender` both resolve to the same underlying string
+  /// (`'user_gender'`), so only one is listed here.
+  static const List<String> _allKeys = <String>[
+    AppConstants.keyUserName,
+    AppConstants.keyPublisherType,
+    AppConstants.keyGender,
+    AppConstants.keyBirthDate,
+    AppConstants.keyRegularPioneerStartDate,
+    AppConstants.keySpecialPioneerStartDate,
+    AppConstants.keyThemeMode,
+    // ignore: deprecated_member_use_from_same_package
+    AppConstants.keyDefaultGoalType,
+    // ignore: deprecated_member_use_from_same_package
+    AppConstants.keyUserAge,
+  ];
+
+  /// Serialize all profile-related preferences to a JSON-friendly map.
+  /// Missing keys are omitted (not included as null) so the backup is compact
+  /// and restoring a backup without a key leaves the current value untouched.
+  Map<String, Object?> captureAsMap() {
+    final prefs = _preferences;
+    final map = <String, Object?>{};
+    for (final key in _allKeys) {
+      if (!prefs.containsKey(key)) continue;
+      map[key] = prefs.get(key);
+    }
+    return map;
+  }
+
+  /// Restore preferences from a backup map.
+  /// Clears existing profile keys first (including theme and legacy),
+  /// then writes every value from [data] using its runtime type.
+  Future<void> restoreFromMap(Map<String, Object?> data) async {
+    final prefs = _preferences;
+    for (final key in _allKeys) {
+      await prefs.remove(key);
+    }
+    for (final entry in data.entries) {
+      final value = entry.value;
+      if (value == null) continue;
+      if (value is String) {
+        await prefs.setString(entry.key, value);
+      } else if (value is int) {
+        await prefs.setInt(entry.key, value);
+      } else if (value is double) {
+        await prefs.setDouble(entry.key, value);
+      } else if (value is bool) {
+        await prefs.setBool(entry.key, value);
+      } else if (value is List) {
+        await prefs.setStringList(
+          entry.key,
+          value.map((e) => e.toString()).toList(),
+        );
+      }
+    }
+  }
 }
