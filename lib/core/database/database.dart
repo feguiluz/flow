@@ -11,6 +11,15 @@ import 'package:sqflite/sqflite.dart';
 class AppDatabase {
   AppDatabase._init();
 
+  static const int kDatabaseVersion = 5;
+  static const List<String> kTableNames = [
+    'activities',
+    'people',
+    'visits',
+    'goals',
+    'participations',
+  ];
+
   static final AppDatabase instance = AppDatabase._init();
   static Database? _database;
 
@@ -40,7 +49,7 @@ class AppDatabase {
 
     final db = await openDatabase(
       path,
-      version: 5, // Incremented to add participations table
+      version: kDatabaseVersion,
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
       onConfigure: _onConfigure,
@@ -242,5 +251,16 @@ class AppDatabase {
     final db = await instance.database;
     await db.close();
     _database = null;
+  }
+
+  /// Delete all rows from all application tables within a single transaction.
+  /// Leaves the schema intact. Used before restoring a backup.
+  Future<void> deleteAllData() async {
+    final db = await database;
+    await db.transaction((txn) async {
+      for (final table in kTableNames) {
+        await txn.delete(table);
+      }
+    });
   }
 }

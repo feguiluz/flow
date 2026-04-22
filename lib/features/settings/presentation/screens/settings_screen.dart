@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:flow/features/backup/presentation/widgets/backup_section.dart';
 import 'package:flow/features/profile/presentation/screens/profile_edit_screen.dart';
 import 'package:flow/shared/models/gender.dart';
 import 'package:flow/shared/models/publisher_type.dart';
@@ -127,6 +128,20 @@ class SettingsScreen extends ConsumerWidget {
 
             const SizedBox(height: 32),
 
+            // Backup Section
+            Text(
+              'COPIA DE SEGURIDAD',
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.2,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const BackupSection(),
+
+            const SizedBox(height: 32),
+
             // About Section
             Text(
               'ACERCA DE',
@@ -146,7 +161,7 @@ class SettingsScreen extends ConsumerWidget {
                       color: colorScheme.primary,
                     ),
                     title: const Text('Versión'),
-                    subtitle: const Text('1.0.0'),
+                    subtitle: const Text('1.1.0'),
                   ),
                   const Divider(height: 1),
                   ListTile(
