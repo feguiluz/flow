@@ -40,6 +40,10 @@ dependencies:
   # PDF & Sharing
   pdf: ^3.10.8
   share_plus: ^7.2.2
+
+  # Backup / File System
+  file_picker: ^8.1.0
+  path_provider: ^2.1.4
   
   # Models & Serialization
   freezed_annotation: ^2.4.1
