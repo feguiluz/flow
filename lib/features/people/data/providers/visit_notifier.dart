@@ -25,25 +25,27 @@ class VisitNotifier extends _$VisitNotifier {
     }
   }
 
-  /// Add a new visit
-  Future<void> addVisit(Visit visit) async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final visitDao = await ref.read(visitDaoProvider.future);
-      await visitDao.insert(visit);
+  /// Add a new visit. Returns the inserted [Visit] with its database id so
+  /// callers can link it to other entities (e.g. completing a calendar event).
+  Future<Visit> addVisit(Visit visit) async {
+    final visitDao = await ref.read(visitDaoProvider.future);
+    final newId = await visitDao.insert(visit);
+    final inserted = visit.copyWith(id: newId);
 
-      // Invalidate all visit-related providers to refresh UI
-      ref.invalidate(visitsByPersonProvider);
-      ref.invalidate(visitsByMonthProvider);
-      ref.invalidate(bibleStudiesCountForMonthProvider);
-      ref.invalidate(visitCountByPersonProvider);
+    // Invalidate all visit-related providers to refresh UI
+    ref.invalidate(visitsByPersonProvider);
+    ref.invalidate(visitsByMonthProvider);
+    ref.invalidate(bibleStudiesCountForMonthProvider);
+    ref.invalidate(visitCountByPersonProvider);
 
-      // Invalidate month summary to update Bible studies count on home
-      ref.invalidate(monthSummaryProvider);
-      ref.invalidate(currentMonthSummaryProvider);
+    // Invalidate month summary to update Bible studies count on home
+    ref.invalidate(monthSummaryProvider);
+    ref.invalidate(currentMonthSummaryProvider);
 
-      return await visitDao.getByPerson(_personId);
-    });
+    // Refresh local list
+    state = AsyncValue.data(await visitDao.getByPerson(_personId));
+
+    return inserted;
   }
 
   /// Update an existing visit

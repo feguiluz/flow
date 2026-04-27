@@ -35,6 +35,7 @@ class ActivityNotifier extends _$ActivityNotifier {
       ref.invalidate(serviceYearTotalMinutesProvider);
       ref.invalidate(serviceYearTotalUpToProvider);
       ref.invalidate(monthSummaryProvider);
+      ref.invalidate(minutesByDayForMonthProvider);
 
       final now = DateTime.now();
       return activityDao.getByMonth(now.year, now.month);
@@ -54,6 +55,7 @@ class ActivityNotifier extends _$ActivityNotifier {
       ref.invalidate(serviceYearTotalMinutesProvider);
       ref.invalidate(serviceYearTotalUpToProvider);
       ref.invalidate(monthSummaryProvider);
+      ref.invalidate(minutesByDayForMonthProvider);
 
       final now = DateTime.now();
       return activityDao.getByMonth(now.year, now.month);
@@ -73,6 +75,7 @@ class ActivityNotifier extends _$ActivityNotifier {
       ref.invalidate(serviceYearTotalMinutesProvider);
       ref.invalidate(serviceYearTotalUpToProvider);
       ref.invalidate(monthSummaryProvider);
+      ref.invalidate(minutesByDayForMonthProvider);
 
       final now = DateTime.now();
       return activityDao.getByMonth(now.year, now.month);
@@ -127,6 +130,18 @@ Future<Map<int, int>> yearlyMinutesByMonth(
 ) async {
   final activityDao = await ref.watch(activityDaoProvider.future);
   return activityDao.getMinutesByMonthForYear(year);
+}
+
+/// Provider for minutes per day inside a specific month.
+/// Used by the calendar to mark active days and show per-day totals.
+@riverpod
+Future<Map<int, int>> minutesByDayForMonth(
+  MinutesByDayForMonthRef ref,
+  int year,
+  int month,
+) async {
+  final activityDao = await ref.watch(activityDaoProvider.future);
+  return activityDao.getMinutesByDayForMonth(year, month);
 }
 
 /// Provider for total minutes in a specific month

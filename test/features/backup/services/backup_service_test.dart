@@ -66,6 +66,23 @@ Future<void> _createSchema(Database db, int _) async {
       UNIQUE(year, month)
     )
   ''');
+  await db.execute('''
+    CREATE TABLE events (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      person_id INTEGER NOT NULL,
+      series_id TEXT,
+      date TEXT NOT NULL,
+      time TEXT,
+      notes TEXT,
+      status TEXT NOT NULL DEFAULT 'pending',
+      visit_id INTEGER,
+      recurrence_weeks INTEGER,
+      recurrence_end_date TEXT,
+      created_at TEXT NOT NULL,
+      FOREIGN KEY (person_id) REFERENCES people (id) ON DELETE CASCADE,
+      FOREIGN KEY (visit_id) REFERENCES visits (id) ON DELETE SET NULL
+    )
+  ''');
 }
 
 Future<Database> _openInMemory() {
@@ -158,6 +175,59 @@ void main() {
       'participated': 1,
       'created_at': '2026-04-01T00:00:00.000',
     });
+    // One single + a 2-instance series + one already completed (linked to visit 1).
+    await db.insert('events', {
+      'id': 1,
+      'person_id': 1,
+      'series_id': null,
+      'date': '2026-04-20',
+      'time': '18:30',
+      'notes': 'one-off',
+      'status': 'pending',
+      'visit_id': null,
+      'recurrence_weeks': null,
+      'recurrence_end_date': null,
+      'created_at': '2026-04-18T17:30:00.000',
+    });
+    await db.insert('events', {
+      'id': 2,
+      'person_id': 1,
+      'series_id': 'series-abc',
+      'date': '2026-05-04',
+      'time': '19:00',
+      'notes': null,
+      'status': 'pending',
+      'visit_id': null,
+      'recurrence_weeks': 1,
+      'recurrence_end_date': '2026-05-11',
+      'created_at': '2026-04-18T17:30:00.000',
+    });
+    await db.insert('events', {
+      'id': 3,
+      'person_id': 1,
+      'series_id': 'series-abc',
+      'date': '2026-05-11',
+      'time': '19:00',
+      'notes': null,
+      'status': 'pending',
+      'visit_id': null,
+      'recurrence_weeks': 1,
+      'recurrence_end_date': '2026-05-11',
+      'created_at': '2026-04-18T17:30:00.000',
+    });
+    await db.insert('events', {
+      'id': 4,
+      'person_id': 1,
+      'series_id': null,
+      'date': '2026-04-05',
+      'time': null,
+      'notes': 'past — became visit 1',
+      'status': 'completed',
+      'visit_id': 1,
+      'recurrence_weeks': null,
+      'recurrence_end_date': null,
+      'created_at': '2026-04-04T10:00:00.000',
+    });
   }
 
   group('BackupService', () {
@@ -176,6 +246,11 @@ void main() {
       expect(content, contains('"schemaVersion": ${AppDatabase.kDatabaseVersion}'));
       expect(content, contains('"user_name": "Juan"'));
       expect(content, contains('"name": "Ana"'));
+      // Calendar events are also exported.
+      expect(content, contains('"events"'));
+      expect(content, contains('"series_id": "series-abc"'));
+      expect(content, contains('"time": "18:30"'));
+      expect(content, contains('"status": "completed"'));
 
       await db.close();
     });
@@ -189,6 +264,8 @@ void main() {
       final exported = await service.exportToTempFile();
 
       // 2. Wipe everything and replace profile values
+      // Order matters because events FK to visits and people.
+      await db.delete('events');
       await db.delete('activities');
       await db.delete('visits');
       await db.delete('people');
@@ -207,6 +284,7 @@ void main() {
       final visits = await db.query('visits');
       final goals = await db.query('goals');
       final parts = await db.query('participations');
+      final events = await db.query('events', orderBy: 'id');
 
       expect(activities, hasLength(1));
       expect(activities.first['id'], 1);
@@ -226,9 +304,61 @@ void main() {
       expect(parts, hasLength(1));
       expect(parts.first['participated'], 1);
 
+      expect(events, hasLength(4));
+      expect(events.first['id'], 1);
+      expect(events.first['date'], '2026-04-20');
+      expect(events.first['time'], '18:30');
+      expect(events[1]['series_id'], 'series-abc');
+      expect(events[1]['recurrence_weeks'], 1);
+      expect(events.last['status'], 'completed');
+      expect(events.last['visit_id'], 1);
+
       expect(UserProfileService.instance.getUserName(), 'Juan');
       expect(UserProfileService.instance.getBirthDate(),
           DateTime(1990, 5, 20));
+
+      await db.close();
+    });
+
+    test('imports an old backup that lacks the events key without errors',
+        () async {
+      // Forge a legacy backup payload (schemaVersion 5, no `events`) on disk
+      // and try to import it. The service must default events to [] and not
+      // crash, leaving the rest of the state restored.
+      final db = await _openInMemory();
+      final service = await buildService(db);
+
+      final legacy = '''
+{
+  "meta": {
+    "format": "flow-backup-v1",
+    "appVersion": "1.1.0",
+    "schemaVersion": 5,
+    "createdAt": "2026-03-01T00:00:00.000Z"
+  },
+  "preferences": {
+    "user_name": "Maria",
+    "user_publisher_type": "publisher",
+    "user_gender": "female",
+    "user_birth_date": "1985-01-01"
+  },
+  "data": {
+    "activities": [],
+    "people": [],
+    "visits": [],
+    "goals": [],
+    "participations": []
+  }
+}
+''';
+      final legacyFile = File('${tempDir.path}/legacy.flow');
+      await legacyFile.writeAsString(legacy);
+
+      await service.importFromFile(legacyFile);
+
+      final events = await db.query('events');
+      expect(events, isEmpty);
+      expect(UserProfileService.instance.getUserName(), 'Maria');
 
       await db.close();
     });
