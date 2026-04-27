@@ -116,5 +116,23 @@ final participationDaoProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef ParticipationDaoRef = AutoDisposeFutureProviderRef<ParticipationDao>;
+String _$eventDaoHash() => r'822235ece14de70f311c2effda0e1dcdde1f01a5';
+
+/// Provider for EventDao
+///
+/// Copied from [eventDao].
+@ProviderFor(eventDao)
+final eventDaoProvider = AutoDisposeFutureProvider<EventDao>.internal(
+  eventDao,
+  name: r'eventDaoProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$eventDaoHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef EventDaoRef = AutoDisposeFutureProviderRef<EventDao>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

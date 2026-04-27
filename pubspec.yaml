@@ -1,7 +1,7 @@
 name: flow
 description: Ministry activity tracker for Jehovah's Witnesses
 publish_to: 'none'
-version: 1.1.0+2
+version: 1.2.0+3
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
@@ -36,6 +36,10 @@ dependencies:
   
   # Charts
   fl_chart: ^0.66.2
+
+  # Calendar
+  table_calendar: ^3.0.9
+  uuid: ^4.5.1
   
   # PDF & Sharing
   pdf: ^3.10.8

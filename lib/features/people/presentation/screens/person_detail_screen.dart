@@ -9,6 +9,10 @@ import '../../../../shared/widgets/confirmation_dialog.dart';
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/error_view.dart';
 import '../../../../shared/widgets/loading_indicator.dart';
+import '../../../calendar/data/models/calendar_event.dart';
+import '../../../calendar/data/providers/event_provider.dart';
+import '../../../calendar/presentation/widgets/event_detail_sheet.dart';
+import '../../../calendar/presentation/widgets/event_edit_sheet.dart';
 import '../../data/providers/person_notifier.dart';
 import '../../data/providers/visit_notifier.dart';
 import '../widgets/add_person_sheet.dart';
@@ -213,6 +217,9 @@ class PersonDetailScreen extends ConsumerWidget {
             ),
           ),
 
+          // Upcoming events
+          _UpcomingEventsSection(personId: person.id!),
+
           // Visit history header
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -311,6 +318,177 @@ class PersonDetailScreen extends ConsumerWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Compact list of upcoming events for [personId]. Hidden when the person
+/// has no future pending events. Includes a CTA to schedule a new event.
+class _UpcomingEventsSection extends ConsumerWidget {
+  const _UpcomingEventsSection({required this.personId});
+  final int personId;
+
+  Future<void> _openCreate(BuildContext context) async {
+    await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => EventEditSheet(
+        mode: EventEditMode.create,
+        initialPersonId: personId,
+      ),
+    );
+  }
+
+  Future<void> _openDetail(BuildContext context, CalendarEvent event) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => EventDetailSheet(event: event),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final upcomingAsync =
+        ref.watch(upcomingEventsByPersonProvider(personId));
+
+    return upcomingAsync.maybeWhen(
+      data: (events) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Próximas visitas',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  TextButton.icon(
+                    onPressed: () => _openCreate(context),
+                    icon: const Icon(Icons.add, size: 18),
+                    label: const Text('Programar'),
+                  ),
+                ],
+              ),
+              if (events.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Text(
+                    'No hay visitas programadas',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                )
+              else
+                SizedBox(
+                  height: 112,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: events.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 8),
+                    itemBuilder: (_, i) {
+                      final e = events[i];
+                      return _UpcomingEventChip(
+                        event: e,
+                        onTap: () => _openDetail(context, e),
+                      );
+                    },
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+      orElse: () => const SizedBox.shrink(),
+    );
+  }
+}
+
+class _UpcomingEventChip extends StatelessWidget {
+  const _UpcomingEventChip({required this.event, required this.onTap});
+
+  final CalendarEvent event;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final time = event.time;
+    final timeLabel = time != null
+        ? '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}'
+        : 'Sin hora';
+
+    return SizedBox(
+      width: 168,
+      child: Card(
+        color: colorScheme.surfaceContainerHighest,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.event,
+                        size: 18, color: colorScheme.primary),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        DateFormatter.getRelativeDate(event.date),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  timeLabel,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                if (event.seriesId != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Row(
+                      children: [
+                        Icon(Icons.repeat,
+                            size: 14,
+                            color: colorScheme.onSurfaceVariant),
+                        const SizedBox(width: 4),
+                        Text(
+                          event.recurrenceWeeks == 1
+                              ? 'Cada semana'
+                              : 'Cada ${event.recurrenceWeeks} sem.',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

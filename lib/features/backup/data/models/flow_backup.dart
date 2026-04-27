@@ -89,6 +89,7 @@ class BackupData {
     this.visits = const [],
     this.goals = const [],
     this.participations = const [],
+    this.events = const [],
   });
 
   final List<Map<String, Object?>> activities;
@@ -96,6 +97,7 @@ class BackupData {
   final List<Map<String, Object?>> visits;
   final List<Map<String, Object?>> goals;
   final List<Map<String, Object?>> participations;
+  final List<Map<String, Object?>> events;
 
   Map<String, Object?> toJson() => {
         'activities': activities,
@@ -103,6 +105,7 @@ class BackupData {
         'visits': visits,
         'goals': goals,
         'participations': participations,
+        'events': events,
       };
 
   factory BackupData.fromJson(Map<String, Object?> json) {
@@ -112,6 +115,7 @@ class BackupData {
       visits: _asRowList(json['visits']),
       goals: _asRowList(json['goals']),
       participations: _asRowList(json['participations']),
+      events: _asRowList(json['events']),
     );
   }
 }

@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../../core/database/daos/activity_dao.dart';
+import '../../core/database/daos/event_dao.dart';
 import '../../core/database/daos/goal_dao.dart';
 import '../../core/database/daos/participation_dao.dart';
 import '../../core/database/daos/person_dao.dart';
@@ -49,4 +50,11 @@ Future<GoalDao> goalDao(GoalDaoRef ref) async {
 Future<ParticipationDao> participationDao(ParticipationDaoRef ref) async {
   final db = await ref.watch(databaseProvider.future);
   return ParticipationDao(db);
+}
+
+/// Provider for EventDao
+@riverpod
+Future<EventDao> eventDao(EventDaoRef ref) async {
+  final db = await ref.watch(databaseProvider.future);
+  return EventDao(db);
 }
