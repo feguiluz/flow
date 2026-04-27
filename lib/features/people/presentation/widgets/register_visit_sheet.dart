@@ -12,12 +12,23 @@ class RegisterVisitSheet extends ConsumerStatefulWidget {
     super.key,
     required this.personId,
     this.visit,
+    this.prefilledDate,
+    this.onVisitCreated,
   });
 
   final int personId;
 
   /// If provided, the sheet will be in edit mode
   final Visit? visit;
+
+  /// Default date to show when creating a new visit. Ignored when editing
+  /// or when [visit] is provided. Useful when launching the sheet from a
+  /// scheduled calendar event.
+  final DateTime? prefilledDate;
+
+  /// Called with the newly inserted [Visit] (with its database id) right
+  /// before the sheet closes. Only fires on creation, not on edit.
+  final ValueChanged<Visit>? onVisitCreated;
 
   @override
   ConsumerState<RegisterVisitSheet> createState() => _RegisterVisitSheetState();
@@ -32,8 +43,9 @@ class _RegisterVisitSheetState extends ConsumerState<RegisterVisitSheet> {
   @override
   void initState() {
     super.initState();
-    // Use visit date or today
-    _selectedDate = widget.visit?.date ?? DateTime.now();
+    // Edit > prefilled > today.
+    _selectedDate =
+        widget.visit?.date ?? widget.prefilledDate ?? DateTime.now();
     _notesController = TextEditingController(text: widget.visit?.notes ?? '');
   }
 
@@ -85,10 +97,11 @@ class _RegisterVisitSheetState extends ConsumerState<RegisterVisitSheet> {
 
       if (widget.visit == null) {
         // Add new visit
-        await ref
+        final inserted = await ref
             .read(visitNotifierProvider(widget.personId).notifier)
             .addVisit(visit);
         if (mounted) {
+          widget.onVisitCreated?.call(inserted);
           AppBanner.showSuccess(context, 'Revisita registrada');
           Navigator.of(context).pop();
         }

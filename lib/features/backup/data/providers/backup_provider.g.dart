@@ -6,7 +6,7 @@ part of 'backup_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$backupServiceHash() => r'9ba40a180ea12b5d6f80fa527966377c3d3c4dea';
+String _$backupServiceHash() => r'67e90c45f182e52f8475422517ab9c9469c73714';
 
 /// Provider for the singleton [BackupService].
 ///
@@ -25,7 +25,7 @@ final backupServiceProvider = AutoDisposeProvider<BackupService>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef BackupServiceRef = AutoDisposeProviderRef<BackupService>;
-String _$backupNotifierHash() => r'bb84ea47e64d5c1eba13d223dc37d9799a94afe6';
+String _$backupNotifierHash() => r'49a6dd3065a2f3c099a1af9365a6c009bcfe2dd8';
 
 /// Orchestrates export/import flows from the UI. Exposes async methods
 /// rather than state because the operations are one-shot and the UI

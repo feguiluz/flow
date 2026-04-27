@@ -47,7 +47,7 @@ class BackupService {
     required DatabaseResolver resolveDatabase,
     required UserProfileService profileService,
     FlowFileCodec codec = const FlowFileCodec(),
-    String appVersion = '1.1.0',
+    String appVersion = '1.2.0',
     DateTime Function() clock = _defaultClock,
     Future<Directory> Function()? exportDirProvider,
     Future<Directory> Function()? snapshotDirProvider,
@@ -81,6 +81,7 @@ class BackupService {
       visits: await _dumpTable(db, 'visits'),
       goals: await _dumpTable(db, 'goals'),
       participations: await _dumpTable(db, 'participations'),
+      events: await _dumpTable(db, 'events'),
     );
     return FlowBackup(
       meta: BackupMeta(
@@ -152,6 +153,8 @@ class BackupService {
       await _restoreTable(txn, 'visits', backup.data.visits);
       await _restoreTable(txn, 'goals', backup.data.goals);
       await _restoreTable(txn, 'participations', backup.data.participations);
+      // events references people.id and visits.id, so must come last.
+      await _restoreTable(txn, 'events', backup.data.events);
     });
 
     await _profile.restoreFromMap(backup.preferences);

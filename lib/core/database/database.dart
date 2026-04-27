@@ -11,13 +11,14 @@ import 'package:sqflite/sqflite.dart';
 class AppDatabase {
   AppDatabase._init();
 
-  static const int kDatabaseVersion = 5;
+  static const int kDatabaseVersion = 6;
   static const List<String> kTableNames = [
     'activities',
     'people',
     'visits',
     'goals',
     'participations',
+    'events',
   ];
 
   static final AppDatabase instance = AppDatabase._init();
@@ -167,6 +168,34 @@ class AppDatabase {
       print('✅ Migration to v5 completed');
     }
 
+    if (oldVersion < 6) {
+      // Migration from version 5 to 6: Add events table for the calendar
+      await db.execute('''
+        CREATE TABLE events (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          person_id INTEGER NOT NULL,
+          series_id TEXT,
+          date TEXT NOT NULL,
+          time TEXT,
+          notes TEXT,
+          status TEXT NOT NULL DEFAULT 'pending',
+          visit_id INTEGER,
+          recurrence_weeks INTEGER,
+          recurrence_end_date TEXT,
+          created_at TEXT NOT NULL,
+          FOREIGN KEY (person_id) REFERENCES people (id) ON DELETE CASCADE,
+          FOREIGN KEY (visit_id) REFERENCES visits (id) ON DELETE SET NULL
+        )
+      ''');
+
+      await db.execute('CREATE INDEX idx_events_date ON events(date)');
+      await db.execute('CREATE INDEX idx_events_person ON events(person_id)');
+      await db.execute('CREATE INDEX idx_events_series ON events(series_id)');
+
+      // ignore: avoid_print
+      print('✅ Migration to v6 completed');
+    }
+
     // ignore: avoid_print
     print('✅ All migrations completed successfully');
   }
@@ -236,6 +265,25 @@ class AppDatabase {
       )
     ''');
 
+    // Events table - calendar events linked to a person, optionally recurring
+    await db.execute('''
+      CREATE TABLE events (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        person_id INTEGER NOT NULL,
+        series_id TEXT,
+        date TEXT NOT NULL,
+        time TEXT,
+        notes TEXT,
+        status TEXT NOT NULL DEFAULT 'pending',
+        visit_id INTEGER,
+        recurrence_weeks INTEGER,
+        recurrence_end_date TEXT,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (person_id) REFERENCES people (id) ON DELETE CASCADE,
+        FOREIGN KEY (visit_id) REFERENCES visits (id) ON DELETE SET NULL
+      )
+    ''');
+
     // Create indexes for better query performance
     await db.execute('CREATE INDEX idx_activities_date ON activities(date)');
     await db.execute('CREATE INDEX idx_visits_person ON visits(person_id)');
@@ -244,6 +292,9 @@ class AppDatabase {
     await db.execute(
       'CREATE INDEX idx_participations_year_month ON participations(year, month)',
     );
+    await db.execute('CREATE INDEX idx_events_date ON events(date)');
+    await db.execute('CREATE INDEX idx_events_person ON events(person_id)');
+    await db.execute('CREATE INDEX idx_events_series ON events(series_id)');
   }
 
   /// Close database connection

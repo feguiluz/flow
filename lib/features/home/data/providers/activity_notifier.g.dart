@@ -354,6 +354,174 @@ class _YearlyMinutesByMonthProviderElement
   int get year => (origin as YearlyMinutesByMonthProvider).year;
 }
 
+String _$minutesByDayForMonthHash() =>
+    r'8f7a8cf53311eb9e8cca91b364194ae4b7d9b8ca';
+
+/// Provider for minutes per day inside a specific month.
+/// Used by the calendar to mark active days and show per-day totals.
+///
+/// Copied from [minutesByDayForMonth].
+@ProviderFor(minutesByDayForMonth)
+const minutesByDayForMonthProvider = MinutesByDayForMonthFamily();
+
+/// Provider for minutes per day inside a specific month.
+/// Used by the calendar to mark active days and show per-day totals.
+///
+/// Copied from [minutesByDayForMonth].
+class MinutesByDayForMonthFamily extends Family<AsyncValue<Map<int, int>>> {
+  /// Provider for minutes per day inside a specific month.
+  /// Used by the calendar to mark active days and show per-day totals.
+  ///
+  /// Copied from [minutesByDayForMonth].
+  const MinutesByDayForMonthFamily();
+
+  /// Provider for minutes per day inside a specific month.
+  /// Used by the calendar to mark active days and show per-day totals.
+  ///
+  /// Copied from [minutesByDayForMonth].
+  MinutesByDayForMonthProvider call(
+    int year,
+    int month,
+  ) {
+    return MinutesByDayForMonthProvider(
+      year,
+      month,
+    );
+  }
+
+  @override
+  MinutesByDayForMonthProvider getProviderOverride(
+    covariant MinutesByDayForMonthProvider provider,
+  ) {
+    return call(
+      provider.year,
+      provider.month,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'minutesByDayForMonthProvider';
+}
+
+/// Provider for minutes per day inside a specific month.
+/// Used by the calendar to mark active days and show per-day totals.
+///
+/// Copied from [minutesByDayForMonth].
+class MinutesByDayForMonthProvider
+    extends AutoDisposeFutureProvider<Map<int, int>> {
+  /// Provider for minutes per day inside a specific month.
+  /// Used by the calendar to mark active days and show per-day totals.
+  ///
+  /// Copied from [minutesByDayForMonth].
+  MinutesByDayForMonthProvider(
+    int year,
+    int month,
+  ) : this._internal(
+          (ref) => minutesByDayForMonth(
+            ref as MinutesByDayForMonthRef,
+            year,
+            month,
+          ),
+          from: minutesByDayForMonthProvider,
+          name: r'minutesByDayForMonthProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$minutesByDayForMonthHash,
+          dependencies: MinutesByDayForMonthFamily._dependencies,
+          allTransitiveDependencies:
+              MinutesByDayForMonthFamily._allTransitiveDependencies,
+          year: year,
+          month: month,
+        );
+
+  MinutesByDayForMonthProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.year,
+    required this.month,
+  }) : super.internal();
+
+  final int year;
+  final int month;
+
+  @override
+  Override overrideWith(
+    FutureOr<Map<int, int>> Function(MinutesByDayForMonthRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: MinutesByDayForMonthProvider._internal(
+        (ref) => create(ref as MinutesByDayForMonthRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        year: year,
+        month: month,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<Map<int, int>> createElement() {
+    return _MinutesByDayForMonthProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is MinutesByDayForMonthProvider &&
+        other.year == year &&
+        other.month == month;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, year.hashCode);
+    hash = _SystemHash.combine(hash, month.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin MinutesByDayForMonthRef on AutoDisposeFutureProviderRef<Map<int, int>> {
+  /// The parameter `year` of this provider.
+  int get year;
+
+  /// The parameter `month` of this provider.
+  int get month;
+}
+
+class _MinutesByDayForMonthProviderElement
+    extends AutoDisposeFutureProviderElement<Map<int, int>>
+    with MinutesByDayForMonthRef {
+  _MinutesByDayForMonthProviderElement(super.provider);
+
+  @override
+  int get year => (origin as MinutesByDayForMonthProvider).year;
+  @override
+  int get month => (origin as MinutesByDayForMonthProvider).month;
+}
+
 String _$getTotalMinutesForMonthHash() =>
     r'f00e0c3ca5351106fe4417dee7e305eca57f7fb8';
 
@@ -832,7 +1000,7 @@ class _ServiceYearTotalUpToProviderElement
   DateTime get upToDate => (origin as ServiceYearTotalUpToProvider).upToDate;
 }
 
-String _$activityNotifierHash() => r'c439ccdaf3fff8d77e616976835a2136753371a3';
+String _$activityNotifierHash() => r'c4412892ec1e62e46d52f3a1d991effedf989958';
 
 /// Provider for managing activity data for the current month
 ///

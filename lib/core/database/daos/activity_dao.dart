@@ -158,6 +158,30 @@ class ActivityDao {
     return minutesMap;
   }
 
+  /// Get total minutes per day for a specific month.
+  /// Returns a map of {day-of-month: minutes}. Days without activity are
+  /// omitted, so a missing key means zero minutes that day.
+  Future<Map<int, int>> getMinutesByDayForMonth(int year, int month) async {
+    final monthStr = month.toString().padLeft(2, '0');
+    final result = await db.rawQuery(
+      '''
+      SELECT
+        CAST(strftime('%d', date) AS INTEGER) as day,
+        SUM(minutes) as total
+      FROM activities
+      WHERE date LIKE ?
+      GROUP BY day
+      ''',
+      ['$year-$monthStr-%'],
+    );
+
+    final byDay = <int, int>{};
+    for (final row in result) {
+      byDay[row['day'] as int] = (row['total'] as num).toInt();
+    }
+    return byDay;
+  }
+
   /// Get all activities for a date range
   Future<List<Activity>> getByDateRange(
     DateTime startDate,

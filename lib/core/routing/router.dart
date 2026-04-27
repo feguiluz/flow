@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:flow/core/services/user_profile_service.dart';
+import 'package:flow/features/calendar/presentation/screens/calendar_screen.dart';
 import 'package:flow/features/home/presentation/screens/home_screen.dart';
 import 'package:flow/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:flow/features/onboarding/presentation/screens/welcome_screen.dart';
@@ -40,6 +41,11 @@ class ScaffoldWithNavBar extends StatelessWidget {
             icon: Icon(Icons.people_outline),
             selectedIcon: Icon(Icons.people),
             label: 'Personas',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.calendar_today_outlined),
+            selectedIcon: Icon(Icons.calendar_today),
+            label: 'Calendario',
           ),
           NavigationDestination(
             icon: Icon(Icons.bar_chart_outlined),
@@ -110,6 +116,15 @@ final router = GoRouter(
             GoRoute(
               path: '/people',
               builder: (context, state) => const PeopleScreen(),
+            ),
+          ],
+        ),
+        // Calendar branch
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/calendar',
+              builder: (context, state) => const CalendarScreen(),
             ),
           ],
         ),
