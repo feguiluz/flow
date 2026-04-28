@@ -33,6 +33,9 @@ dependencies:
   # Location
   geolocator: ^11.0.0
   geocoding: ^3.0.0
+
+  # Maps / external apps
+  url_launcher: ^6.3.0
   
   # Charts
   fl_chart: ^0.66.2
