@@ -32,6 +32,11 @@ class _AddPersonSheetState extends ConsumerState<AddPersonSheet> {
   bool _isLoadingLocation = false;
   double? _latitude;
   double? _longitude;
+  // True only while `_useCurrentLocation` writes the address text. Lets the
+  // address listener tell apart programmatic updates (auto-fill) from user
+  // typing — in the latter case we drop the saved coords because they no
+  // longer match the text the user is settling on.
+  bool _settingAddressProgrammatically = false;
   final _locationService = LocationService();
 
   @override
@@ -44,15 +49,34 @@ class _AddPersonSheetState extends ConsumerState<AddPersonSheet> {
         TextEditingController(text: widget.person?.address ?? '');
     _notesController = TextEditingController(text: widget.person?.notes ?? '');
     _isBibleStudy = widget.person?.isBibleStudy ?? false;
+    // Carry over coords from the edited person so the listener below can
+    // observe them and the save path persists them unchanged when the user
+    // leaves the address alone.
+    _latitude = widget.person?.latitude;
+    _longitude = widget.person?.longitude;
+    _addressController.addListener(_onAddressTextChanged);
   }
 
   @override
   void dispose() {
+    _addressController.removeListener(_onAddressTextChanged);
     _nameController.dispose();
     _phoneController.dispose();
     _addressController.dispose();
     _notesController.dispose();
     super.dispose();
+  }
+
+  /// Clears stored coordinates when the user manually edits the address
+  /// text. Keeps lat/lng in sync with the address shown in the field, which
+  /// is the value navigation will use.
+  void _onAddressTextChanged() {
+    if (_settingAddressProgrammatically) return;
+    if (_latitude == null && _longitude == null) return;
+    setState(() {
+      _latitude = null;
+      _longitude = null;
+    });
   }
 
   Future<void> _useCurrentLocation() async {
@@ -88,7 +112,12 @@ class _AddPersonSheetState extends ConsumerState<AddPersonSheet> {
         final finalAddress = address ??
             '${position.latitude.toStringAsFixed(6)}, ${position.longitude.toStringAsFixed(6)}';
 
+        // Suppress the address listener while we sync text + coords from
+        // the geolocator; otherwise it would immediately wipe the coords
+        // we just set.
+        _settingAddressProgrammatically = true;
         _addressController.text = finalAddress;
+        _settingAddressProgrammatically = false;
         _latitude = position.latitude;
         _longitude = position.longitude;
 
@@ -105,10 +134,11 @@ class _AddPersonSheetState extends ConsumerState<AddPersonSheet> {
         if (hasNumber) {
           AppBanner.showSuccess(context, 'Ubicación obtenida');
         } else {
-          // Suggest adding number manually
+          // Warn that editing the address resets the captured coordinates.
           AppBanner.showSuccess(
             context,
-            'Ubicación obtenida. Puedes agregar el número si lo deseas.',
+            'Ubicación obtenida. Si editas la dirección, '
+                'la ubicación exacta se descarta.',
           );
         }
       }
@@ -148,8 +178,11 @@ class _AddPersonSheetState extends ConsumerState<AddPersonSheet> {
             ? null
             : _notesController.text.trim(),
         isBibleStudy: _isBibleStudy,
-        latitude: _latitude ?? widget.person?.latitude,
-        longitude: _longitude ?? widget.person?.longitude,
+        // Use the in-form coords directly. They mirror the user's intent:
+        // preserved when the address text is untouched, cleared when it
+        // was edited, refreshed when "Usar mi ubicación" was tapped again.
+        latitude: _latitude,
+        longitude: _longitude,
         createdAt: widget.person?.createdAt ?? DateTime.now(),
       );
 

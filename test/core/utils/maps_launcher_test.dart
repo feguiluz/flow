@@ -22,29 +22,32 @@ void main() {
   group('MapsLauncher.buildDirectionsUri', () {
     const sut = MapsLauncher();
 
-    test('uses lat/lng when both are present', () {
-      final uri = sut.buildDirectionsUri(
-        _person(latitude: 40.4168, longitude: -3.7038),
-      );
-
-      expect(uri, isNotNull);
-      expect(uri!.host, 'www.google.com');
-      expect(uri.path, '/maps/dir/');
-      expect(uri.queryParameters['destination'], '40.4168,-3.7038');
-      expect(uri.queryParameters['api'], '1');
-      expect(uri.queryParameters['travelmode'], 'driving');
-    });
-
-    test('falls back to address text when coordinates are missing', () {
+    test('uses address text when only address is present', () {
       final uri = sut.buildDirectionsUri(
         _person(address: 'Calle Mayor 12, Madrid'),
       );
 
       expect(uri, isNotNull);
-      expect(uri!.queryParameters['destination'], 'Calle Mayor 12, Madrid');
+      expect(uri!.host, 'www.google.com');
+      expect(uri.path, '/maps/dir/');
+      expect(uri.queryParameters['destination'], 'Calle Mayor 12, Madrid');
+      expect(uri.queryParameters['api'], '1');
+      expect(uri.queryParameters['travelmode'], 'driving');
     });
 
-    test('prefers coordinates over address when both are present', () {
+    test('falls back to lat/lng when address is missing', () {
+      final uri = sut.buildDirectionsUri(
+        _person(latitude: 40.4168, longitude: -3.7038),
+      );
+
+      expect(uri, isNotNull);
+      expect(uri!.queryParameters['destination'], '40.4168,-3.7038');
+    });
+
+    test('prefers address text over coordinates when both are present', () {
+      // Coords can drift from the address text when the user auto-captured
+      // the location and then manually edited the street/number. The text
+      // is treated as the source of truth.
       final uri = sut.buildDirectionsUri(
         _person(
           address: 'Calle Mayor 12, Madrid',
@@ -53,7 +56,7 @@ void main() {
         ),
       );
 
-      expect(uri!.queryParameters['destination'], '40.4168,-3.7038');
+      expect(uri!.queryParameters['destination'], 'Calle Mayor 12, Madrid');
     });
 
     test('returns null when person has neither coords nor address', () {
@@ -83,13 +86,19 @@ void main() {
       expect(uri.query, contains('%26')); // &
     });
 
-    test('only one coordinate present (lat without lng) falls back to address',
+    test('only one coordinate present (lat without lng) still uses address',
         () {
       final uri = sut.buildDirectionsUri(
         _person(latitude: 40.4, address: 'Calle Sol 3'),
       );
 
       expect(uri!.queryParameters['destination'], 'Calle Sol 3');
+    });
+
+    test('half coordinates without address returns null', () {
+      // Defensive: coords are stored as a pair; lat-only is meaningless.
+      expect(sut.buildDirectionsUri(_person(latitude: 40.4)), isNull);
+      expect(sut.buildDirectionsUri(_person(longitude: -3.7)), isNull);
     });
 
     test('always emits travelmode=driving', () {
