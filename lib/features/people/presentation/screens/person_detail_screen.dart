@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/date_formatter.dart';
+import '../../../../core/utils/maps_launcher.dart';
 import '../../../../core/utils/phone_formatter.dart';
 import '../../../../shared/models/person.dart';
 import '../../../../shared/widgets/app_banner.dart';
@@ -201,6 +202,12 @@ class PersonDetailScreen extends ConsumerWidget {
                       Icons.location_on_outlined,
                       'Dirección',
                       person.address!,
+                      trailing: IconButton(
+                        tooltip: 'Cómo llegar (Google Maps)',
+                        icon: const Icon(Icons.directions),
+                        color: colorScheme.primary,
+                        onPressed: () => _openDirections(context),
+                      ),
                     ),
                     const SizedBox(height: 12),
                   ],
@@ -285,8 +292,9 @@ class PersonDetailScreen extends ConsumerWidget {
     BuildContext context,
     IconData icon,
     String label,
-    String value,
-  ) {
+    String value, {
+    Widget? trailing,
+  }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -317,8 +325,23 @@ class PersonDetailScreen extends ConsumerWidget {
             ],
           ),
         ),
+        if (trailing != null) trailing,
       ],
     );
+  }
+
+  Future<void> _openDirections(BuildContext context) async {
+    final result = await const MapsLauncher().openDirectionsTo(person);
+    if (!context.mounted) return;
+    switch (result) {
+      case MapsLaunchResult.launched:
+        break;
+      case MapsLaunchResult.noAddress:
+        AppBanner.showError(
+            context, 'Esta persona no tiene dirección guardada');
+      case MapsLaunchResult.failed:
+        AppBanner.showError(context, 'No se pudo abrir Google Maps');
+    }
   }
 }
 
