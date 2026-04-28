@@ -247,10 +247,10 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         onPressed: () => _openCreateSheet(context),
-        icon: const Icon(Icons.event),
-        label: const Text('Programar visita'),
+        tooltip: 'Programar visita',
+        child: const Icon(Icons.event),
       ),
     );
   }
