@@ -19,21 +19,28 @@ class MapsLauncher {
 
   /// Build a `https://www.google.com/maps/dir/?api=1` directions URL.
   ///
-  /// Returns `null` when [person] has neither coordinates nor a non-empty
-  /// address — the UI should hide the entry point in that case.
+  /// Prefers the free-text [Person.address] when present: users frequently
+  /// auto-capture the device's location and then edit the street/number to
+  /// match the actual home, leaving lat/lng pinned to a slightly different
+  /// spot. Treating the (possibly-edited) address as the source of truth
+  /// avoids navigating to a stale pin. Coordinates are used only as a
+  /// fallback when no address text is stored.
+  ///
+  /// Returns `null` when [person] has neither a non-empty address nor
+  /// coordinates — the UI should hide the entry point in that case.
   Uri? buildDirectionsUri(Person person) {
     final params = <String, String>{
       'api': '1',
       'travelmode': 'driving',
     };
-    final lat = person.latitude;
-    final lng = person.longitude;
-    if (lat != null && lng != null) {
-      params['destination'] = '$lat,$lng';
-    } else {
-      final address = person.address?.trim();
-      if (address == null || address.isEmpty) return null;
+    final address = person.address?.trim();
+    if (address != null && address.isNotEmpty) {
       params['destination'] = address;
+    } else {
+      final lat = person.latitude;
+      final lng = person.longitude;
+      if (lat == null || lng == null) return null;
+      params['destination'] = '$lat,$lng';
     }
     return Uri.https('www.google.com', '/maps/dir/', params);
   }
