@@ -47,7 +47,7 @@ class BackupService {
     required DatabaseResolver resolveDatabase,
     required UserProfileService profileService,
     FlowFileCodec codec = const FlowFileCodec(),
-    String appVersion = '1.2.0',
+    String appVersion = '1.2.1',
     DateTime Function() clock = _defaultClock,
     Future<Directory> Function()? exportDirProvider,
     Future<Directory> Function()? snapshotDirProvider,
