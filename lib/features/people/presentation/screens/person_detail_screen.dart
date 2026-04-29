@@ -29,7 +29,7 @@ class PersonDetailScreen extends ConsumerWidget {
 
   final Person person;
 
-  Future<void> _showEditSheet(BuildContext context) async {
+  Future<void> _showEditSheet(BuildContext context, Person target) async {
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -45,13 +45,16 @@ class PersonDetailScreen extends ConsumerWidget {
           padding: EdgeInsets.only(
             bottom: MediaQuery.of(context).viewInsets.bottom,
           ),
-          child: AddPersonSheet(person: person),
+          child: AddPersonSheet(person: target),
         ),
       ),
     );
   }
 
-  Future<void> _showRegisterVisitSheet(BuildContext context) async {
+  Future<void> _showRegisterVisitSheet(
+    BuildContext context,
+    int personId,
+  ) async {
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -67,17 +70,21 @@ class PersonDetailScreen extends ConsumerWidget {
           padding: EdgeInsets.only(
             bottom: MediaQuery.of(context).viewInsets.bottom,
           ),
-          child: RegisterVisitSheet(personId: person.id!),
+          child: RegisterVisitSheet(personId: personId),
         ),
       ),
     );
   }
 
-  Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
+  Future<void> _confirmDelete(
+    BuildContext context,
+    WidgetRef ref,
+    Person target,
+  ) async {
     final confirmed = await ConfirmationDialog.show(
       context,
       title: 'Eliminar persona',
-      message: '¿Estás seguro de que deseas eliminar a ${person.name}? '
+      message: '¿Estás seguro de que deseas eliminar a ${target.name}? '
           'Esto también eliminará todas las revisitas registradas. '
           'Esta acción no se puede deshacer.',
       confirmText: 'Eliminar',
@@ -88,7 +95,7 @@ class PersonDetailScreen extends ConsumerWidget {
       try {
         await ref
             .read(personNotifierProvider.notifier)
-            .deletePerson(person.id!);
+            .deletePerson(target.id!);
 
         if (context.mounted) {
           AppBanner.showSuccess(context, 'Persona eliminada');
@@ -107,22 +114,28 @@ class PersonDetailScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
+    // Observe the live record so edits surface without needing a re-entry.
+    // Fall back to the constructor copy while the provider is loading or
+    // briefly null (e.g. just after delete) to avoid spinner / blank flicker.
+    final liveAsync = ref.watch(personByIdProvider(person.id!));
+    final live = liveAsync.value ?? person;
+
     // Watch visits for this person
-    final visitsAsync = ref.watch(visitsByPersonProvider(person.id!));
+    final visitsAsync = ref.watch(visitsByPersonProvider(live.id!));
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(person.name),
+        title: Text(live.name),
         actions: [
           // Edit button
           IconButton(
-            onPressed: () => _showEditSheet(context),
+            onPressed: () => _showEditSheet(context, live),
             icon: const Icon(Icons.edit),
             tooltip: 'Editar',
           ),
           // Delete button
           IconButton(
-            onPressed: () => _confirmDelete(context, ref),
+            onPressed: () => _confirmDelete(context, ref, live),
             icon: Icon(
               Icons.delete,
               color: colorScheme.error,
@@ -150,7 +163,7 @@ class PersonDetailScreen extends ConsumerWidget {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: person.isBibleStudy
+                          color: live.isBibleStudy
                               ? colorScheme.primaryContainer
                               : colorScheme.secondaryContainer,
                           borderRadius: BorderRadius.circular(12),
@@ -159,21 +172,21 @@ class PersonDetailScreen extends ConsumerWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
-                              person.isBibleStudy
+                              live.isBibleStudy
                                   ? Icons.book
                                   : Icons.person_outline,
                               size: 16,
-                              color: person.isBibleStudy
+                              color: live.isBibleStudy
                                   ? colorScheme.onPrimaryContainer
                                   : colorScheme.onSecondaryContainer,
                             ),
                             const SizedBox(width: 6),
                             Text(
-                              person.isBibleStudy
+                              live.isBibleStudy
                                   ? 'Curso bíblico'
                                   : 'Persona interesada',
                               style: theme.textTheme.labelMedium?.copyWith(
-                                color: person.isBibleStudy
+                                color: live.isBibleStudy
                                     ? colorScheme.onPrimaryContainer
                                     : colorScheme.onSecondaryContainer,
                                 fontWeight: FontWeight.bold,
@@ -187,36 +200,36 @@ class PersonDetailScreen extends ConsumerWidget {
                   const SizedBox(height: 16),
 
                   // Contact info
-                  if (person.phone != null) ...[
+                  if (live.phone != null) ...[
                     _buildInfoRow(
                       context,
                       Icons.phone_outlined,
                       'Teléfono',
-                      formatMexicanPhone(person.phone!),
+                      formatMexicanPhone(live.phone!),
                     ),
                     const SizedBox(height: 12),
                   ],
-                  if (person.address != null) ...[
+                  if (live.address != null) ...[
                     _buildInfoRow(
                       context,
                       Icons.location_on_outlined,
                       'Dirección',
-                      person.address!,
+                      live.address!,
                       trailing: IconButton(
                         tooltip: 'Cómo llegar (Google Maps)',
                         icon: const Icon(Icons.directions),
                         color: colorScheme.primary,
-                        onPressed: () => _openDirections(context),
+                        onPressed: () => _openDirections(context, live),
                       ),
                     ),
                     const SizedBox(height: 12),
                   ],
-                  if (person.notes != null) ...[
+                  if (live.notes != null) ...[
                     _buildInfoRow(
                       context,
                       Icons.notes_outlined,
                       'Notas',
-                      person.notes!,
+                      live.notes!,
                     ),
                   ],
                 ],
@@ -225,7 +238,7 @@ class PersonDetailScreen extends ConsumerWidget {
           ),
 
           // Upcoming events
-          _UpcomingEventsSection(personId: person.id!),
+          _UpcomingEventsSection(personId: live.id!),
 
           // Visit history header
           Padding(
@@ -240,7 +253,7 @@ class PersonDetailScreen extends ConsumerWidget {
                   ),
                 ),
                 TextButton.icon(
-                  onPressed: () => _showRegisterVisitSheet(context),
+                  onPressed: () => _showRegisterVisitSheet(context, live.id!),
                   icon: const Icon(Icons.add, size: 18),
                   label: const Text('Registrar revisita'),
                 ),
@@ -271,7 +284,7 @@ class PersonDetailScreen extends ConsumerWidget {
                     return VisitItem(
                       key: ValueKey(visit.id),
                       visit: visit,
-                      personId: person.id!,
+                      personId: live.id!,
                     );
                   },
                 );
@@ -279,7 +292,7 @@ class PersonDetailScreen extends ConsumerWidget {
               loading: () => const LoadingIndicator(),
               error: (error, stack) => ErrorView(
                 message: error.toString(),
-                onRetry: () => ref.refresh(visitsByPersonProvider(person.id!)),
+                onRetry: () => ref.refresh(visitsByPersonProvider(live.id!)),
               ),
             ),
           ),
@@ -330,8 +343,8 @@ class PersonDetailScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _openDirections(BuildContext context) async {
-    final result = await const MapsLauncher().openDirectionsTo(person);
+  Future<void> _openDirections(BuildContext context, Person target) async {
+    final result = await const MapsLauncher().openDirectionsTo(target);
     if (!context.mounted) return;
     switch (result) {
       case MapsLaunchResult.launched:
