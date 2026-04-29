@@ -33,6 +33,7 @@ class AppConstants {
   static const String keyRegularPioneerStartDate = 'regular_pioneer_start_date';
   static const String keySpecialPioneerStartDate = 'special_pioneer_start_date';
   static const String keyThemeMode = 'theme_mode';
+  static const String keyPeopleSort = 'people_sort';
 
   // Deprecated keys (kept for migration, will be removed in future)
   @Deprecated('Use keyPublisherType instead')

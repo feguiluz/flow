@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../features/people/data/models/people_sort_option.dart';
 import '../../shared/models/gender.dart';
 import '../../shared/models/goal.dart';
 import '../../shared/models/publisher_type.dart';
@@ -110,6 +111,19 @@ class UserProfileService {
       return ThemeMode.values.firstWhere((e) => e.name == value);
     } catch (_) {
       return ThemeMode.system;
+    }
+  }
+
+  /// Get the saved sort option for the people list. Returns the enum's
+  /// declared default when nothing is stored yet or the value is unknown
+  /// (e.g. left over from a removed option).
+  PeopleSortOption getPeopleSortOption() {
+    final value = _preferences.getString(AppConstants.keyPeopleSort);
+    if (value == null) return PeopleSortOption.defaultOption;
+    try {
+      return PeopleSortOption.values.firstWhere((e) => e.name == value);
+    } catch (_) {
+      return PeopleSortOption.defaultOption;
     }
   }
 
@@ -235,6 +249,11 @@ class UserProfileService {
   /// Set theme mode
   Future<void> setThemeMode(ThemeMode mode) async {
     await _preferences.setString(AppConstants.keyThemeMode, mode.name);
+  }
+
+  /// Persist the chosen sort option for the people list.
+  Future<void> setPeopleSortOption(PeopleSortOption option) async {
+    await _preferences.setString(AppConstants.keyPeopleSort, option.name);
   }
 
   // ==================== Deprecated Setters (for backward compatibility) ====================
