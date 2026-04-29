@@ -33,6 +33,7 @@ class PersonNotifier extends _$PersonNotifier {
       ref.invalidate(interestedPersonsProvider);
       ref.invalidate(bibleStudiesCountProvider);
       ref.invalidate(interestedPersonsCountProvider);
+      ref.invalidate(personByIdProvider);
 
       // Invalidate month summary to update Bible studies count on home
       ref.invalidate(monthSummaryProvider);
@@ -54,6 +55,8 @@ class PersonNotifier extends _$PersonNotifier {
       ref.invalidate(interestedPersonsProvider);
       ref.invalidate(bibleStudiesCountProvider);
       ref.invalidate(interestedPersonsCountProvider);
+      // Detail screens (and the event detail sheet) watch this family.
+      ref.invalidate(personByIdProvider);
 
       // Invalidate month summary to update Bible studies count on home
       ref.invalidate(monthSummaryProvider);
@@ -75,6 +78,7 @@ class PersonNotifier extends _$PersonNotifier {
       ref.invalidate(interestedPersonsProvider);
       ref.invalidate(bibleStudiesCountProvider);
       ref.invalidate(interestedPersonsCountProvider);
+      ref.invalidate(personByIdProvider);
 
       // Invalidate month summary to update Bible studies count on home
       ref.invalidate(monthSummaryProvider);
