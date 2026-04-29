@@ -4,6 +4,9 @@ import '../../../../core/database/daos/person_dao.dart';
 import '../../../../shared/models/person.dart';
 import '../../../../shared/providers/database_provider.dart';
 import '../../../home/data/providers/month_summary_provider.dart';
+import '../models/people_sort_option.dart';
+import '../services/people_sort_service.dart';
+import 'people_sort_option_provider.dart';
 
 part 'person_notifier.g.dart';
 
@@ -150,4 +153,34 @@ Future<int> interestedPersonsCount(InterestedPersonsCountRef ref) async {
 Future<Person?> personById(PersonByIdRef ref, int id) async {
   final personDao = await ref.watch(personDaoProvider.future);
   return personDao.getById(id);
+}
+
+/// Interested persons ordered by the user's chosen sort option.
+@riverpod
+Future<List<Person>> sortedInterestedPersons(
+  SortedInterestedPersonsRef ref,
+) async {
+  final option = ref.watch(peopleSortOptionNotifierProvider);
+  final persons = await ref.watch(interestedPersonsProvider.future);
+  if (option != PeopleSortOption.lastVisitDesc || persons.isEmpty) {
+    return sortPersons(persons, option);
+  }
+  final visitDao = await ref.read(visitDaoProvider.future);
+  final ids = persons.map((p) => p.id).whereType<int>().toList();
+  final lastVisits = await visitDao.getLastVisitDateByPerson(ids);
+  return sortPersons(persons, option, lastVisits: lastVisits);
+}
+
+/// Bible studies ordered by the user's chosen sort option.
+@riverpod
+Future<List<Person>> sortedBibleStudies(SortedBibleStudiesRef ref) async {
+  final option = ref.watch(peopleSortOptionNotifierProvider);
+  final persons = await ref.watch(bibleStudiesProvider.future);
+  if (option != PeopleSortOption.lastVisitDesc || persons.isEmpty) {
+    return sortPersons(persons, option);
+  }
+  final visitDao = await ref.read(visitDaoProvider.future);
+  final ids = persons.map((p) => p.id).whereType<int>().toList();
+  final lastVisits = await visitDao.getLastVisitDateByPerson(ids);
+  return sortPersons(persons, option, lastVisits: lastVisits);
 }
