@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../data/providers/person_notifier.dart';
 import '../widgets/add_person_sheet.dart';
+import '../widgets/people_sort_sheet.dart';
 import '../widgets/person_list.dart';
 import 'person_detail_screen.dart';
 
@@ -64,9 +65,10 @@ class _PeopleScreenState extends ConsumerState<PeopleScreen>
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    // Watch providers for both lists
-    final bibleStudiesAsync = ref.watch(bibleStudiesProvider);
-    final interestedPersonsAsync = ref.watch(interestedPersonsProvider);
+    // Watch providers for both lists (sorted variant — order follows the
+    // user's choice persisted in PeopleSortOptionNotifier).
+    final bibleStudiesAsync = ref.watch(sortedBibleStudiesProvider);
+    final interestedPersonsAsync = ref.watch(sortedInterestedPersonsProvider);
 
     // Watch counts for badges
     final bibleStudiesCountAsync = ref.watch(bibleStudiesCountProvider);
@@ -76,6 +78,13 @@ class _PeopleScreenState extends ConsumerState<PeopleScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Personas'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.sort),
+            tooltip: 'Ordenar por…',
+            onPressed: () => PeopleSortSheet.show(context),
+          ),
+        ],
         bottom: TabBar(
           controller: _tabController,
           tabs: [

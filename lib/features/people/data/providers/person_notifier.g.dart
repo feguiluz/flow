@@ -246,7 +246,49 @@ class _PersonByIdProviderElement
   int get id => (origin as PersonByIdProvider).id;
 }
 
-String _$personNotifierHash() => r'7513530be09acb9b313ace4d5e53e34a5e442ddb';
+String _$sortedInterestedPersonsHash() =>
+    r'7e0318c9ee353f09acb0ef45285d3c9434acf56b';
+
+/// Interested persons ordered by the user's chosen sort option.
+///
+/// Copied from [sortedInterestedPersons].
+@ProviderFor(sortedInterestedPersons)
+final sortedInterestedPersonsProvider =
+    AutoDisposeFutureProvider<List<Person>>.internal(
+  sortedInterestedPersons,
+  name: r'sortedInterestedPersonsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$sortedInterestedPersonsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef SortedInterestedPersonsRef = AutoDisposeFutureProviderRef<List<Person>>;
+String _$sortedBibleStudiesHash() =>
+    r'5c48d54e7cbc7a789f6f7f2a8741a3bf3e8bfadb';
+
+/// Bible studies ordered by the user's chosen sort option.
+///
+/// Copied from [sortedBibleStudies].
+@ProviderFor(sortedBibleStudies)
+final sortedBibleStudiesProvider =
+    AutoDisposeFutureProvider<List<Person>>.internal(
+  sortedBibleStudies,
+  name: r'sortedBibleStudiesProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$sortedBibleStudiesHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef SortedBibleStudiesRef = AutoDisposeFutureProviderRef<List<Person>>;
+String _$personNotifierHash() => r'56a8a209090c48a8974a7113609f54eeaae5e354';
 
 /// Provider for managing person data (Bible studies and interested persons)
 ///
