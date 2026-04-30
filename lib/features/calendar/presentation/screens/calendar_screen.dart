@@ -10,6 +10,8 @@ import 'package:flow/features/calendar/presentation/widgets/event_detail_sheet.d
 import 'package:flow/features/calendar/presentation/widgets/event_edit_sheet.dart';
 import 'package:flow/features/calendar/presentation/widgets/event_list_item.dart';
 import 'package:flow/features/home/data/providers/activity_notifier.dart';
+import 'package:flow/shared/widgets/motion/fade_slide_in.dart';
+import 'package:flow/shared/widgets/motion/scale_tap.dart';
 
 /// Monthly calendar with event markers and an editable list of events for
 /// the selected day. Predication activity is signalled with a secondary marker
@@ -222,11 +224,14 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                     return Column(
                       children: [
                         for (final event in events)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 8),
-                            child: EventListItem(
-                              event: event,
-                              onTap: () => _openDetail(context, event),
+                          FadeSlideIn(
+                            key: ValueKey(event.id),
+                            child: Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: EventListItem(
+                                event: event,
+                                onTap: () => _openDetail(context, event),
+                              ),
                             ),
                           ),
                       ],
@@ -247,10 +252,12 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _openCreateSheet(context),
-        tooltip: 'Programar visita',
-        child: const Icon(Icons.event),
+      floatingActionButton: ScaleTap(
+        child: FloatingActionButton(
+          onPressed: () => _openCreateSheet(context),
+          tooltip: 'Programar visita',
+          child: const Icon(Icons.event),
+        ),
       ),
     );
   }

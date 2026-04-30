@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../data/providers/person_notifier.dart';
 import '../widgets/add_person_sheet.dart';
+import '../../../../shared/widgets/motion/scale_tap.dart';
 import '../widgets/people_sort_sheet.dart';
 import '../widgets/person_list.dart';
 import 'person_detail_screen.dart';
@@ -187,9 +188,11 @@ class _PeopleScreenState extends ConsumerState<PeopleScreen>
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showAddPersonSheet,
-        child: const Icon(Icons.person_add),
+      floatingActionButton: ScaleTap(
+        child: FloatingActionButton(
+          onPressed: _showAddPersonSheet,
+          child: const Icon(Icons.person_add),
+        ),
       ),
     );
   }
