@@ -5,6 +5,7 @@ import '../../../../shared/models/person.dart';
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/error_view.dart';
 import '../../../../shared/widgets/loading_indicator.dart';
+import '../../../../shared/widgets/motion/fade_slide_in.dart';
 import 'person_item.dart';
 
 /// Widget that displays a list of persons
@@ -36,10 +37,14 @@ class PersonList extends ConsumerWidget {
           itemCount: persons.length,
           itemBuilder: (context, index) {
             final person = persons[index];
-            return PersonItem(
+            // Keyed identity preserves the FadeSlideIn state across
+            // scrolls, so the fade-in plays once per item lifecycle.
+            return FadeSlideIn(
               key: ValueKey(person.id),
-              person: person,
-              onTap: () => onPersonTap(person),
+              child: PersonItem(
+                person: person,
+                onTap: () => onPersonTap(person),
+              ),
             );
           },
         );

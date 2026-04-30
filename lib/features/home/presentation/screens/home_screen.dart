@@ -6,6 +6,7 @@ import 'package:flow/shared/models/publisher_type.dart';
 import 'package:flow/shared/providers/user_profile_provider.dart';
 import 'package:flow/features/home/data/providers/goal_notifier.dart';
 import 'package:flow/shared/widgets/app_banner.dart';
+import '../../../../shared/widgets/motion/scale_tap.dart';
 import '../widgets/activity_list.dart';
 import '../widgets/month_summary_card.dart';
 import '../widgets/register_activity_sheet.dart';
@@ -236,10 +237,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ],
       ),
       floatingActionButton: canRegisterHours
-          ? FloatingActionButton(
-              onPressed: _showRegisterSheet,
-              tooltip: 'Registrar horas',
-              child: const Icon(Icons.add),
+          ? ScaleTap(
+              child: FloatingActionButton(
+                onPressed: _showRegisterSheet,
+                tooltip: 'Registrar horas',
+                child: const Icon(Icons.add),
+              ),
             )
           : null,
     );

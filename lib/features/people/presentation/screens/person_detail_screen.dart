@@ -10,6 +10,7 @@ import '../../../../shared/widgets/confirmation_dialog.dart';
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/error_view.dart';
 import '../../../../shared/widgets/loading_indicator.dart';
+import '../../../../shared/widgets/motion/fade_slide_in.dart';
 import '../../../calendar/data/models/calendar_event.dart';
 import '../../../calendar/data/providers/event_provider.dart';
 import '../../../calendar/presentation/widgets/event_detail_sheet.dart';
@@ -281,10 +282,12 @@ class PersonDetailScreen extends ConsumerWidget {
                   itemCount: visits.length,
                   itemBuilder: (context, index) {
                     final visit = visits[index];
-                    return VisitItem(
+                    return FadeSlideIn(
                       key: ValueKey(visit.id),
-                      visit: visit,
-                      personId: live.id!,
+                      child: VisitItem(
+                        visit: visit,
+                        personId: live.id!,
+                      ),
                     );
                   },
                 );
