@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:flow/core/theme/motion.dart';
+
 /// Compact card showing the predication minutes registered on the selected day.
 class CalendarDaySummary extends StatelessWidget {
   const CalendarDaySummary({super.key, required this.minutes});
@@ -12,14 +14,18 @@ class CalendarDaySummary extends StatelessWidget {
   static const Color _green = Color(0xFF2E7D32); // Material green 800
   static const Color _greenContainer = Color(0xFFC8E6C9); // green 100
 
+  String _format(int total) {
+    final hours = total ~/ 60;
+    final mins = total % 60;
+    if (hours > 0) {
+      return mins > 0 ? '${hours}h ${mins}min' : '${hours}h';
+    }
+    return '$mins min';
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final hours = minutes ~/ 60;
-    final mins = minutes % 60;
-    final formatted = hours > 0
-        ? (mins > 0 ? '${hours}h ${mins}min' : '${hours}h')
-        : '$mins min';
 
     return Card(
       color: _greenContainer,
@@ -42,11 +48,18 @@ class CalendarDaySummary extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 2),
-                  Text(
-                    formatted,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: _green,
+                  // Animate the integer so the number ticks up to the real
+                  // value when a day with activity is selected.
+                  TweenAnimationBuilder<int>(
+                    duration: AppMotion.md,
+                    curve: AppMotion.standard,
+                    tween: IntTween(begin: 0, end: minutes),
+                    builder: (context, value, _) => Text(
+                      _format(value),
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: _green,
+                      ),
                     ),
                   ),
                 ],

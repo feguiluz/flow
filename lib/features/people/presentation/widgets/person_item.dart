@@ -43,22 +43,28 @@ class PersonItem extends ConsumerWidget {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              // Leading icon
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: person.isBibleStudy
-                      ? colorScheme.primaryContainer
-                      : colorScheme.secondaryContainer,
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: Icon(
-                  person.isBibleStudy ? Icons.book : Icons.person_outline,
-                  color: person.isBibleStudy
-                      ? colorScheme.onPrimaryContainer
-                      : colorScheme.onSecondaryContainer,
-                  size: 24,
+              // Leading icon — Hero source matched in PersonDetailScreen.
+              Hero(
+                tag: 'person-avatar-${person.id}',
+                child: Material(
+                  type: MaterialType.transparency,
+                  child: Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: person.isBibleStudy
+                          ? colorScheme.primaryContainer
+                          : colorScheme.secondaryContainer,
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    child: Icon(
+                      person.isBibleStudy ? Icons.book : Icons.person_outline,
+                      color: person.isBibleStudy
+                          ? colorScheme.onPrimaryContainer
+                          : colorScheme.onSecondaryContainer,
+                      size: 24,
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(width: 16),
@@ -68,11 +74,17 @@ class PersonItem extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Name
-                    Text(
-                      person.name,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w500,
+                    // Name — Hero source matched in PersonDetailScreen.
+                    Hero(
+                      tag: 'person-name-${person.id}',
+                      child: Material(
+                        type: MaterialType.transparency,
+                        child: Text(
+                          person.name,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                       ),
                     ),
 

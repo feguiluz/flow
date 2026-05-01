@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:flow/shared/widgets/motion/fade_slide_in.dart';
+
 /// Reusable empty state widget
 class EmptyState extends StatelessWidget {
   const EmptyState({
@@ -23,31 +25,33 @@ class EmptyState extends StatelessWidget {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 80,
-              color: colorScheme.onSurfaceVariant.withOpacity(0.5),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              message,
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: colorScheme.onSurfaceVariant,
+        child: FadeSlideIn(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: 80,
+                color: colorScheme.onSurfaceVariant.withOpacity(0.5),
               ),
-              textAlign: TextAlign.center,
-            ),
-            if (action != null && actionLabel != null) ...[
-              const SizedBox(height: 24),
-              FilledButton.icon(
-                onPressed: action,
-                icon: const Icon(Icons.add),
-                label: Text(actionLabel!),
+              const SizedBox(height: 16),
+              Text(
+                message,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+                textAlign: TextAlign.center,
               ),
+              if (action != null && actionLabel != null) ...[
+                const SizedBox(height: 24),
+                FilledButton.icon(
+                  onPressed: action,
+                  icon: const Icon(Icons.add),
+                  label: Text(actionLabel!),
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
