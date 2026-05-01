@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:flow/core/theme/motion.dart';
 import 'package:flow/features/backup/data/codecs/flow_file_codec.dart';
 import 'package:flow/features/backup/data/providers/backup_provider.dart';
 import 'package:flow/features/backup/data/services/backup_service.dart';
 import 'package:flow/shared/widgets/app_banner.dart';
 import 'package:flow/shared/widgets/confirmation_dialog.dart';
+import 'package:flow/shared/widgets/motion/fade_slide_in.dart';
 
 /// First screen shown on a fresh install. Offers two entry points:
 ///  - "Empezar" → advance to the regular onboarding wizard
@@ -28,55 +30,79 @@ class WelcomeScreen extends ConsumerWidget {
           child: Column(
             children: [
               const Spacer(),
-              Icon(
-                Icons.auto_graph,
-                size: 96,
-                color: colorScheme.primary,
+              // Hero-style scale+fade entrance for the brand icon.
+              TweenAnimationBuilder<double>(
+                duration: AppMotion.md,
+                curve: AppMotion.decelerate,
+                tween: Tween(begin: 0, end: 1),
+                builder: (_, t, child) => Opacity(
+                  opacity: t,
+                  child: Transform.scale(
+                    scale: 0.7 + (0.3 * t),
+                    child: child,
+                  ),
+                ),
+                child: Icon(
+                  Icons.auto_graph,
+                  size: 96,
+                  color: colorScheme.primary,
+                ),
               ),
               const SizedBox(height: 24),
-              Text(
-                'Bienvenido a Flow',
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
+              FadeSlideIn(
+                child: Text(
+                  'Bienvenido a Flow',
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
-              Text(
-                'Registra tu actividad de predicación de forma sencilla, '
-                'rápida y privada.',
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
+              FadeSlideIn(
+                delay: AppMotion.xs,
+                child: Text(
+                  'Registra tu actividad de predicación de forma sencilla, '
+                  'rápida y privada.',
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
               ),
               const Spacer(),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  onPressed: () => context.go('/onboarding'),
-                  child: const Text(
-                    'Empezar',
-                    style: TextStyle(fontSize: 16),
+              FadeSlideIn(
+                delay: AppMotion.sm,
+                child: SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    onPressed: () => context.go('/onboarding'),
+                    child: const Text(
+                      'Empezar',
+                      style: TextStyle(fontSize: 16),
+                    ),
                   ),
                 ),
               ),
               if (!kIsWeb) ...[
                 const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                    onPressed: () => _handleImport(context, ref),
-                    icon: const Icon(Icons.file_download_outlined),
-                    label: const Text(
-                      'Importar copia de seguridad',
-                      style: TextStyle(fontSize: 16),
+                FadeSlideIn(
+                  delay: AppMotion.sm * 2,
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      onPressed: () => _handleImport(context, ref),
+                      icon: const Icon(Icons.file_download_outlined),
+                      label: const Text(
+                        'Importar copia de seguridad',
+                        style: TextStyle(fontSize: 16),
+                      ),
                     ),
                   ),
                 ),

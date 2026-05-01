@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:flow/core/theme/motion.dart';
+
 /// Helper class for showing app-wide overlay notifications
 class AppBanner {
   AppBanner._();
@@ -103,7 +105,7 @@ class _BannerWidgetState extends State<_BannerWidget>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 300),
+      duration: AppMotion.md,
     );
 
     _slideAnimation = Tween<Offset>(
@@ -111,7 +113,7 @@ class _BannerWidgetState extends State<_BannerWidget>
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _controller,
-      curve: Curves.easeOut,
+      curve: AppMotion.decelerate,
     ));
 
     _controller.forward();
