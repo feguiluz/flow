@@ -162,7 +162,7 @@ class SettingsScreen extends ConsumerWidget {
                       color: colorScheme.primary,
                     ),
                     title: const Text('Versión'),
-                    subtitle: const Text('1.4.0'),
+                    subtitle: const Text('1.4.1'),
                   ),
                   const Divider(height: 1),
                   ListTile(
