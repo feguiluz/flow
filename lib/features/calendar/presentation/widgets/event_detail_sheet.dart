@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:flow/core/routing/app_route.dart';
 import 'package:flow/core/utils/date_formatter.dart';
 import 'package:flow/features/calendar/data/models/calendar_event.dart';
 import 'package:flow/features/calendar/data/providers/event_provider.dart';
 import 'package:flow/features/calendar/presentation/widgets/event_edit_sheet.dart';
 import 'package:flow/features/calendar/presentation/widgets/series_scope_dialog.dart';
 import 'package:flow/features/people/data/providers/person_notifier.dart';
+import 'package:flow/features/people/presentation/screens/person_detail_screen.dart';
 import 'package:flow/features/people/presentation/widgets/register_visit_sheet.dart';
+import 'package:flow/shared/models/person.dart';
 import 'package:flow/shared/widgets/app_banner.dart';
 import 'package:flow/shared/widgets/confirmation_dialog.dart';
 
@@ -69,6 +72,12 @@ class EventDetailSheet extends ConsumerWidget {
                       ],
                     ),
                   ),
+                  if (person != null)
+                    IconButton(
+                      tooltip: 'Ver perfil',
+                      onPressed: () => _openPersonProfile(context, person),
+                      icon: const Icon(Icons.open_in_new),
+                    ),
                   IconButton(
                     onPressed: () => Navigator.of(context).pop(),
                     icon: const Icon(Icons.close),
@@ -178,6 +187,20 @@ class EventDetailSheet extends ConsumerWidget {
   }
 
   // ---------- actions ----------
+
+  Future<void> _openPersonProfile(BuildContext context, Person person) async {
+    // Capture the navigator before popping the sheet — the sheet's context
+    // becomes invalid after pop. Pushing on the same (inner) navigator
+    // keeps the bottom navigation bar visible and lets the system back
+    // button return to the calendar.
+    final navigator = Navigator.of(context);
+    navigator.pop();
+    await navigator.push<void>(
+      appRoute<void>(
+        builder: (_) => PersonDetailScreen(person: person),
+      ),
+    );
+  }
 
   Future<void> _markAsVisited(BuildContext context, WidgetRef ref) async {
     final eventId = event.id;
