@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import 'package:flow/core/theme/motion.dart';
 import 'package:flow/shared/models/month_summary.dart';
 import 'package:flow/shared/models/publisher_type.dart';
 import 'package:flow/shared/providers/user_profile_provider.dart';
@@ -223,14 +224,24 @@ class MonthSummaryCard extends ConsumerWidget {
         ),
         const SizedBox(height: 8),
 
-        // Progress bar
-        ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: LinearProgressIndicator(
-            value: (summary.progressPercentage / 100.0).clamp(0.0, 1.0),
-            minHeight: 12,
-            backgroundColor: colorScheme.surfaceVariant,
-            valueColor: AlwaysStoppedAnimation<Color>(progressColor),
+        // Progress bar — animates from 0 (or previous value) to target on
+        // build, so the bar fills smoothly when the month is opened or the
+        // hours change.
+        TweenAnimationBuilder<double>(
+          duration: AppMotion.lg,
+          curve: AppMotion.emphasized,
+          tween: Tween<double>(
+            begin: 0,
+            end: (summary.progressPercentage / 100.0).clamp(0.0, 1.0),
+          ),
+          builder: (context, value, _) => ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: LinearProgressIndicator(
+              value: value,
+              minHeight: 12,
+              backgroundColor: colorScheme.surfaceVariant,
+              valueColor: AlwaysStoppedAnimation<Color>(progressColor),
+            ),
           ),
         ),
       ],

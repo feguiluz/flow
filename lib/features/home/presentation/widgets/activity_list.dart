@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../shared/widgets/motion/fade_slide_in.dart';
 import '../../data/providers/activity_notifier.dart';
 import 'activity_item.dart';
 
@@ -68,9 +69,9 @@ class ActivityList extends ConsumerWidget {
             itemCount: activities.length,
             itemBuilder: (context, index) {
               final activity = activities[index];
-              return ActivityItem(
+              return FadeSlideIn(
                 key: ValueKey(activity.id),
-                activity: activity,
+                child: ActivityItem(activity: activity),
               );
             },
           ),

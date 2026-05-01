@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'package:flow/core/theme/motion.dart';
+import 'package:flow/shared/widgets/motion/fade_slide_in.dart';
+
 /// Summary cards showing key statistics
 class SummaryCards extends StatelessWidget {
   const SummaryCards({
@@ -25,32 +28,41 @@ class SummaryCards extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: _buildCard(
-              context,
-              icon: Icons.access_time,
-              label: 'Total',
-              value: '${totalHours.toStringAsFixed(1)}h',
-              color: colorScheme.primary,
+            child: FadeSlideIn(
+              delay: AppMotion.xs * 0,
+              child: _buildCard(
+                context,
+                icon: Icons.access_time,
+                label: 'Total',
+                value: '${totalHours.toStringAsFixed(1)}h',
+                color: colorScheme.primary,
+              ),
             ),
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: _buildCard(
-              context,
-              icon: Icons.show_chart,
-              label: 'Promedio',
-              value: '${averageHours.toStringAsFixed(1)}h',
-              color: colorScheme.secondary,
+            child: FadeSlideIn(
+              delay: AppMotion.xs * 1,
+              child: _buildCard(
+                context,
+                icon: Icons.show_chart,
+                label: 'Promedio',
+                value: '${averageHours.toStringAsFixed(1)}h',
+                color: colorScheme.secondary,
+              ),
             ),
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: _buildCard(
-              context,
-              icon: Icons.book,
-              label: 'Cursos',
-              value: totalBibleStudies.toString(),
-              color: colorScheme.tertiary,
+            child: FadeSlideIn(
+              delay: AppMotion.xs * 2,
+              child: _buildCard(
+                context,
+                icon: Icons.book,
+                label: 'Cursos',
+                value: totalBibleStudies.toString(),
+                color: colorScheme.tertiary,
+              ),
             ),
           ),
         ],

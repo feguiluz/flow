@@ -10,6 +10,7 @@ import '../../../../shared/widgets/confirmation_dialog.dart';
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/error_view.dart';
 import '../../../../shared/widgets/loading_indicator.dart';
+import '../../../../shared/widgets/motion/fade_slide_in.dart';
 import '../../../calendar/data/models/calendar_event.dart';
 import '../../../calendar/data/providers/event_provider.dart';
 import '../../../calendar/presentation/widgets/event_detail_sheet.dart';
@@ -154,42 +155,76 @@ class PersonDetailScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Type badge
+                  // Header: Hero avatar + Hero name + type badge below
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: live.isBibleStudy
-                              ? colorScheme.primaryContainer
-                              : colorScheme.secondaryContainer,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
+                      Hero(
+                        tag: 'person-avatar-${live.id}',
+                        child: Material(
+                          type: MaterialType.transparency,
+                          child: Container(
+                            width: 64,
+                            height: 64,
+                            decoration: BoxDecoration(
+                              color: live.isBibleStudy
+                                  ? colorScheme.primaryContainer
+                                  : colorScheme.secondaryContainer,
+                              borderRadius: BorderRadius.circular(32),
+                            ),
+                            child: Icon(
                               live.isBibleStudy
                                   ? Icons.book
                                   : Icons.person_outline,
-                              size: 16,
                               color: live.isBibleStudy
                                   ? colorScheme.onPrimaryContainer
                                   : colorScheme.onSecondaryContainer,
+                              size: 32,
                             ),
-                            const SizedBox(width: 6),
-                            Text(
-                              live.isBibleStudy
-                                  ? 'Curso bíblico'
-                                  : 'Persona interesada',
-                              style: theme.textTheme.labelMedium?.copyWith(
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Hero(
+                              tag: 'person-name-${live.id}',
+                              child: Material(
+                                type: MaterialType.transparency,
+                                child: Text(
+                                  live.name,
+                                  style:
+                                      theme.textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
                                 color: live.isBibleStudy
-                                    ? colorScheme.onPrimaryContainer
-                                    : colorScheme.onSecondaryContainer,
-                                fontWeight: FontWeight.bold,
+                                    ? colorScheme.primaryContainer
+                                    : colorScheme.secondaryContainer,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                live.isBibleStudy
+                                    ? 'Curso bíblico'
+                                    : 'Persona interesada',
+                                style:
+                                    theme.textTheme.labelSmall?.copyWith(
+                                  color: live.isBibleStudy
+                                      ? colorScheme.onPrimaryContainer
+                                      : colorScheme.onSecondaryContainer,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ],
@@ -281,10 +316,12 @@ class PersonDetailScreen extends ConsumerWidget {
                   itemCount: visits.length,
                   itemBuilder: (context, index) {
                     final visit = visits[index];
-                    return VisitItem(
+                    return FadeSlideIn(
                       key: ValueKey(visit.id),
-                      visit: visit,
-                      personId: live.id!,
+                      child: VisitItem(
+                        visit: visit,
+                        personId: live.id!,
+                      ),
                     );
                   },
                 );

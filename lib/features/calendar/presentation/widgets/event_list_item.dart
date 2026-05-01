@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:flow/core/theme/motion.dart';
 import 'package:flow/features/calendar/data/models/calendar_event.dart';
 import 'package:flow/features/people/data/providers/person_notifier.dart';
 
@@ -35,20 +36,38 @@ class EventListItem extends ConsumerWidget {
                 width: 56,
                 child: Column(
                   children: [
-                    Icon(
-                      isCompleted ? Icons.check_circle : Icons.event,
-                      color: isCompleted
-                          ? colorScheme.tertiary
-                          : colorScheme.primary,
+                    AnimatedSwitcher(
+                      duration: AppMotion.sm,
+                      transitionBuilder: (child, animation) =>
+                          ScaleTransition(
+                        scale: animation,
+                        child: FadeTransition(
+                          opacity: animation,
+                          child: child,
+                        ),
+                      ),
+                      child: Icon(
+                        isCompleted ? Icons.check_circle : Icons.event,
+                        key: ValueKey(isCompleted),
+                        color: isCompleted
+                            ? colorScheme.tertiary
+                            : colorScheme.primary,
+                      ),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      event.time != null ? _formatTime(event.time!) : 'Sin hora',
-                      style: theme.textTheme.labelMedium?.copyWith(
+                    AnimatedDefaultTextStyle(
+                      duration: AppMotion.sm,
+                      curve: AppMotion.standard,
+                      style: theme.textTheme.labelMedium!.copyWith(
                         color: isCompleted
                             ? colorScheme.onSurfaceVariant
                             : colorScheme.primary,
                         fontWeight: FontWeight.w600,
+                      ),
+                      child: Text(
+                        event.time != null
+                            ? _formatTime(event.time!)
+                            : 'Sin hora',
                       ),
                     ),
                   ],
@@ -60,16 +79,19 @@ class EventListItem extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     personAsync.when(
-                      data: (p) => Text(
-                        p?.name ?? '—',
-                        style: theme.textTheme.titleMedium?.copyWith(
+                      data: (p) => AnimatedDefaultTextStyle(
+                        duration: AppMotion.sm,
+                        curve: AppMotion.standard,
+                        style: theme.textTheme.titleMedium!.copyWith(
                           fontWeight: FontWeight.w600,
-                          decoration:
-                              isCompleted ? TextDecoration.lineThrough : null,
+                          decoration: isCompleted
+                              ? TextDecoration.lineThrough
+                              : TextDecoration.none,
                           color: isCompleted
                               ? colorScheme.onSurfaceVariant
-                              : null,
+                              : colorScheme.onSurface,
                         ),
+                        child: Text(p?.name ?? '—'),
                       ),
                       loading: () => const Text('Cargando…'),
                       error: (_, __) => const Text('—'),

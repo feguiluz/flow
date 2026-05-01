@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:flow/core/routing/app_route.dart';
 import 'package:flow/features/backup/presentation/widgets/backup_section.dart';
 import 'package:flow/features/profile/presentation/screens/profile_edit_screen.dart';
 import 'package:flow/shared/models/gender.dart';
@@ -102,8 +103,8 @@ class SettingsScreen extends ConsumerWidget {
             // Edit Profile Button
             FilledButton.icon(
               onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
+                Navigator.of(context).push<void>(
+                  appRoute<void>(
                     builder: (context) => const ProfileEditScreen(),
                   ),
                 );
@@ -161,7 +162,7 @@ class SettingsScreen extends ConsumerWidget {
                       color: colorScheme.primary,
                     ),
                     title: const Text('Versión'),
-                    subtitle: const Text('1.3.0'),
+                    subtitle: const Text('1.4.0'),
                   ),
                   const Divider(height: 1),
                   ListTile(

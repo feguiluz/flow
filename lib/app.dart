@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/routing/router.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/motion.dart';
 import 'shared/providers/theme_provider.dart';
 
 /// Root widget for the Flow app
@@ -32,6 +33,8 @@ class FlowApp extends ConsumerWidget {
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
       themeMode: themeMode,
+      themeAnimationDuration: AppMotion.md,
+      themeAnimationCurve: AppMotion.standard,
       routerConfig: router,
     );
   }
