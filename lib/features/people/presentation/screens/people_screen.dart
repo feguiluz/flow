@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../data/providers/person_notifier.dart';
 import '../widgets/add_person_sheet.dart';
+import '../../../../core/routing/app_route.dart';
 import '../../../../shared/widgets/motion/scale_tap.dart';
 import '../widgets/people_sort_sheet.dart';
 import '../widgets/person_list.dart';
@@ -95,28 +96,10 @@ class _PeopleScreenState extends ConsumerState<PeopleScreen>
                 children: [
                   const Text('Interesados'),
                   const SizedBox(width: 8),
-                  interestedPersonsCountAsync.when(
-                    data: (count) => count > 0
-                        ? Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: colorScheme.secondaryContainer,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              '$count',
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: colorScheme.onSecondaryContainer,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          )
-                        : const SizedBox.shrink(),
-                    loading: () => const SizedBox.shrink(),
-                    error: (_, __) => const SizedBox.shrink(),
+                  _AnimatedTabBadge(
+                    countAsync: interestedPersonsCountAsync,
+                    background: colorScheme.secondaryContainer,
+                    foreground: colorScheme.onSecondaryContainer,
                   ),
                 ],
               ),
@@ -127,28 +110,10 @@ class _PeopleScreenState extends ConsumerState<PeopleScreen>
                 children: [
                   const Text('Cursos bíblicos'),
                   const SizedBox(width: 8),
-                  bibleStudiesCountAsync.when(
-                    data: (count) => count > 0
-                        ? Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: colorScheme.primaryContainer,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              '$count',
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: colorScheme.onPrimaryContainer,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          )
-                        : const SizedBox.shrink(),
-                    loading: () => const SizedBox.shrink(),
-                    error: (_, __) => const SizedBox.shrink(),
+                  _AnimatedTabBadge(
+                    countAsync: bibleStudiesCountAsync,
+                    background: colorScheme.primaryContainer,
+                    foreground: colorScheme.onPrimaryContainer,
                   ),
                 ],
               ),
@@ -165,7 +130,7 @@ class _PeopleScreenState extends ConsumerState<PeopleScreen>
             onPersonTap: (person) {
               // Navigate to person detail screen
               Navigator.of(context).push(
-                MaterialPageRoute<void>(
+                appRoute<void>(
                   builder: (context) => PersonDetailScreen(person: person),
                 ),
               );
@@ -179,7 +144,7 @@ class _PeopleScreenState extends ConsumerState<PeopleScreen>
             onPersonTap: (person) {
               // Navigate to person detail screen
               Navigator.of(context).push(
-                MaterialPageRoute<void>(
+                appRoute<void>(
                   builder: (context) => PersonDetailScreen(person: person),
                 ),
               );
@@ -193,6 +158,57 @@ class _PeopleScreenState extends ConsumerState<PeopleScreen>
           onPressed: _showAddPersonSheet,
           child: const Icon(Icons.person_add),
         ),
+      ),
+    );
+  }
+}
+
+/// Pill-shaped tab badge that scales + fades in/out whenever the count
+/// changes. Uses a [ValueKey] on the count so [AnimatedSwitcher] treats
+/// each value as a fresh child and runs the transition.
+class _AnimatedTabBadge extends StatelessWidget {
+  const _AnimatedTabBadge({
+    required this.countAsync,
+    required this.background,
+    required this.foreground,
+  });
+
+  final AsyncValue<int> countAsync;
+  final Color background;
+  final Color foreground;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 200),
+      switchInCurve: Curves.easeOutBack,
+      transitionBuilder: (child, animation) => ScaleTransition(
+        scale: animation,
+        child: FadeTransition(opacity: animation, child: child),
+      ),
+      child: countAsync.maybeWhen(
+        data: (count) {
+          if (count <= 0) {
+            return const SizedBox.shrink(key: ValueKey('badge-empty'));
+          }
+          return Container(
+            key: ValueKey('badge-$count'),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: background,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              '$count',
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: foreground,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          );
+        },
+        orElse: () => const SizedBox.shrink(key: ValueKey('badge-empty')),
       ),
     );
   }

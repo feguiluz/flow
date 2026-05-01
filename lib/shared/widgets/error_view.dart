@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:flow/shared/widgets/motion/fade_slide_in.dart';
+
 /// Reusable error view widget
 class ErrorView extends StatelessWidget {
   const ErrorView({
@@ -21,9 +23,10 @@ class ErrorView extends StatelessWidget {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
+        child: FadeSlideIn(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
             Icon(
               icon,
               size: 64,
@@ -54,7 +57,8 @@ class ErrorView extends StatelessWidget {
                 label: const Text('Reintentar'),
               ),
             ],
-          ],
+            ],
+          ),
         ),
       ),
     );
